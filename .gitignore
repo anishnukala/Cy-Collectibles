@@ -209,3 +209,9 @@ Backend/springboot_example/htmlReport/
 Backend/springboot_example/uploads/
 **/Test Results*.html
 Documents/frontend_testcoverage/**/*.mov
+
+# Tests are maintained on the test-files-archive branch
+**/src/test/
+**/src/androidTest/
+Documents/backend_testcoverage/
+Documents/frontend_testcoverage/

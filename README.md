@@ -18,27 +18,27 @@ Cy Collectibles is an Android marketplace where collectors can discover, buy, an
 
 ### Application overview
 
-![Cy Collectibles application overview](5.jpg)
+![Cy Collectibles application overview](Images/5.jpg)
 
 ### Marketplace and dashboards
 
-![Marketplace, seller dashboard, and administrator dashboard](1.jpg)
+![Marketplace, seller dashboard, and administrator dashboard](Images/1.jpg)
 
 ### Listings, transactions, and AI assistance
 
-![Listing details, transaction history, and active listings](2.jpg)
+![Listing details, transaction history, and active listings](Images/2.jpg)
 
 ### Messaging and CyBot
 
-![Direct messaging, group messaging, and CyBot](3.jpg)
+![Direct messaging, group messaging, and CyBot](Images/3.jpg)
 
 ### Listing creation and profile settings
 
-![Create listing form and profile settings](4.jpg)
+![Create listing form and profile settings](Images/4.jpg)
 
 ## Architecture
 
-![Cy Collectibles software architecture](software%20architecture%20diagram.jpeg)
+![Cy Collectibles software architecture](Images/software%20architecture%20diagram.jpeg)
 
 ## Technology
 
@@ -48,16 +48,15 @@ Cy Collectibles is an Android marketplace where collectors can discover, buy, an
 | Backend API | Java, Spring Boot 3.4, Spring Data JPA, REST, WebSockets |
 | Database | MariaDB |
 | AI | Google Gemini API |
-| Testing | JUnit, Espresso, REST Assured, MockWebServer |
 
 ## Project structure
 
 ```text
 .
-├── Backend/springboot_example/          # Spring Boot API and backend tests
+├── Backend/springboot_example/          # Spring Boot API
 ├── Frontend/tutorials-android_unit1_3_login_signup/
 │   └── AndroidExample/                  # Main Android application
-├── Documents/                           # Diagrams, documentation, and coverage reports
+├── Documents/                           # Diagrams and documentation
 └── Experiments/                         # Team development experiments
 ```
 
@@ -105,27 +104,9 @@ cd Frontend/tutorials-android_unit1_3_login_signup/AndroidExample
 ./gradlew assembleDebug
 ```
 
-## Testing
+## Archived tests
 
-Run the backend test suite:
-
-```bash
-cd Backend/springboot_example
-mvn test
-```
-
-Run the Android unit tests:
-
-```bash
-cd Frontend/tutorials-android_unit1_3_login_signup/AndroidExample
-./gradlew test
-```
-
-Run the Android instrumented tests with an emulator or device connected:
-
-```bash
-./gradlew connectedAndroidTest
-```
+Test source files and generated coverage reports are preserved on the [`test-files-archive`](https://github.com/anishnukala/Cy-Collectibles/tree/test-files-archive) branch and are intentionally excluded from `main`.
 
 ## Security
 
