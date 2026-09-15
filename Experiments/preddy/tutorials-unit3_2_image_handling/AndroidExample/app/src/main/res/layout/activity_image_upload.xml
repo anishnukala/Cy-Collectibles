@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="16dp">
+
+    <Button
+        android:id="@+id/selectBtn"
+        android:layout_width="180dp"
+        android:layout_height="wrap_content"
+        android:text="SELECT IMAGE" />
+
+    <ImageView
+        android:id="@+id/imageSelView"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
+        android:layout_marginTop="30dp"
+        android:scaleType="centerCrop" />
+
+    <Button
+        android:id="@+id/uploadBtn"
+        android:layout_width="180dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:text="UPLOAD" />
+
+</LinearLayout>

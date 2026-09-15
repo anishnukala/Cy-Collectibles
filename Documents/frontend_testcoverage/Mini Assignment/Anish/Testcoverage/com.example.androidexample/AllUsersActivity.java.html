@@ -1,0 +1,278 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AllUsersActivity.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=0;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">debug</a> &gt; <a href="index.source.html" class="el_package">com.example.androidexample</a> &gt; <span class="el_source">AllUsersActivity.java</span></div><h1>AllUsersActivity.java</h1><pre class="source lang-java linenums">package com.example.androidexample;
+
+import android.content.Intent;
+import android.graphics.Typeface;
+import android.os.Bundle;
+import android.util.TypedValue;
+import android.view.Gravity;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.android.volley.Request;
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.Volley;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+<span class="nc" id="L22">public class AllUsersActivity extends AppCompatActivity {</span>
+
+    private static final String BASE_URL = BuildConfig.BASE_URL;
+
+    private TextView btnClose;
+    private LinearLayout usersContainer;
+    private BottomNavigationView bottomNav;
+
+<span class="nc" id="L30">    private long userId = -1;</span>
+<span class="nc" id="L31">    private String username = &quot;&quot;;</span>
+<span class="nc" id="L32">    private String userType = &quot;&quot;;</span>
+
+    /**
+     * Initializes the all users screen, reads admin session data from the intent,
+     * connects UI components, sets the close button behavior, configures bottom
+     * navigation, and loads the list of users from the backend.
+     *
+     * @param savedInstanceState the saved instance state bundle passed to the activity
+     */
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+<span class="nc" id="L43">        super.onCreate(savedInstanceState);</span>
+<span class="nc" id="L44">        setContentView(R.layout.activity_all_users);</span>
+
+<span class="nc" id="L46">        userId = getIntent().getLongExtra(&quot;USER_ID&quot;, -1);</span>
+<span class="nc" id="L47">        username = getIntent().getStringExtra(&quot;USERNAME&quot;);</span>
+<span class="nc" id="L48">        userType = getIntent().getStringExtra(&quot;USERTYPE&quot;);</span>
+
+<span class="nc bnc" id="L50" title="All 2 branches missed.">        if (username == null) username = &quot;&quot;;</span>
+<span class="nc bnc" id="L51" title="All 2 branches missed.">        if (userType == null) userType = &quot;&quot;;</span>
+
+<span class="nc" id="L53">        btnClose = findViewById(R.id.btn_close);</span>
+<span class="nc" id="L54">        usersContainer = findViewById(R.id.users_container);</span>
+<span class="nc" id="L55">        bottomNav = findViewById(R.id.bottom_nav);</span>
+
+<span class="nc" id="L57">        btnClose.setOnClickListener(v -&gt; {</span>
+<span class="nc" id="L58">            Intent intent = new Intent(AllUsersActivity.this, AdminHomeActivity.class);</span>
+<span class="nc" id="L59">            intent.putExtra(&quot;USER_ID&quot;, userId);</span>
+<span class="nc" id="L60">            intent.putExtra(&quot;USERNAME&quot;, username);</span>
+<span class="nc" id="L61">            intent.putExtra(&quot;USERTYPE&quot;, userType);</span>
+<span class="nc" id="L62">            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);</span>
+<span class="nc" id="L63">            startActivity(intent);</span>
+<span class="nc" id="L64">            finish();</span>
+<span class="nc" id="L65">        });</span>
+
+<span class="nc" id="L67">        setupBottomNav();</span>
+<span class="nc" id="L68">        loadUsers();</span>
+<span class="nc" id="L69">    }</span>
+
+    /**
+     * Reloads the user list whenever the activity returns to the foreground.
+     */
+    @Override
+    protected void onResume() {
+<span class="nc" id="L76">        super.onResume();</span>
+<span class="nc" id="L77">        loadUsers();</span>
+<span class="nc" id="L78">    }</span>
+
+    /**
+     * Configures the bottom navigation bar and handles navigation between the
+     * dashboard, banned users page, and all users page.
+     */
+    private void setupBottomNav() {
+<span class="nc bnc" id="L85" title="All 2 branches missed.">        if (bottomNav == null) return;</span>
+
+<span class="nc" id="L87">        bottomNav.setSelectedItemId(R.id.nav_users);</span>
+
+<span class="nc" id="L89">        bottomNav.setOnItemSelectedListener(item -&gt; {</span>
+<span class="nc" id="L90">            int id = item.getItemId();</span>
+
+<span class="nc bnc" id="L92" title="All 2 branches missed.">            if (id == R.id.nav_dashboard) {</span>
+<span class="nc" id="L93">                Intent intent = new Intent(AllUsersActivity.this, AdminHomeActivity.class);</span>
+<span class="nc" id="L94">                intent.putExtra(&quot;USER_ID&quot;, userId);</span>
+<span class="nc" id="L95">                intent.putExtra(&quot;USERNAME&quot;, username);</span>
+<span class="nc" id="L96">                intent.putExtra(&quot;USERTYPE&quot;, userType);</span>
+<span class="nc" id="L97">                startActivity(intent);</span>
+<span class="nc" id="L98">                overridePendingTransition(0, 0);</span>
+<span class="nc" id="L99">                finish();</span>
+<span class="nc" id="L100">                return true;</span>
+
+<span class="nc bnc" id="L102" title="All 2 branches missed.">            } else if (id == R.id.nav_banned) {</span>
+<span class="nc" id="L103">                Intent intent = new Intent(AllUsersActivity.this, BannedUserActivity.class);</span>
+<span class="nc" id="L104">                intent.putExtra(&quot;USER_ID&quot;, userId);</span>
+<span class="nc" id="L105">                intent.putExtra(&quot;USERNAME&quot;, username);</span>
+<span class="nc" id="L106">                intent.putExtra(&quot;USERTYPE&quot;, userType);</span>
+<span class="nc" id="L107">                startActivity(intent);</span>
+<span class="nc" id="L108">                overridePendingTransition(0, 0);</span>
+<span class="nc" id="L109">                finish();</span>
+<span class="nc" id="L110">                return true;</span>
+
+<span class="nc bnc" id="L112" title="All 2 branches missed.">            } else if (id == R.id.nav_users) {</span>
+<span class="nc" id="L113">                return true;</span>
+            }
+
+<span class="nc" id="L116">            return false;</span>
+        });
+<span class="nc" id="L118">    }</span>
+
+    /**
+     * Sends a request to retrieve all users from the backend and either binds the
+     * results to the screen or shows an error message if the request fails.
+     */
+    private void loadUsers() {
+<span class="nc" id="L125">        String url = BASE_URL + &quot;/users&quot;;</span>
+
+<span class="nc" id="L127">        JsonArrayRequest request = new JsonArrayRequest(</span>
+                Request.Method.GET,
+                url,
+                null,
+                this::bindUsers,
+                error -&gt; {
+<span class="nc" id="L133">                    usersContainer.removeAllViews();</span>
+<span class="nc" id="L134">                    addEmptyMessage(&quot;Failed to load users&quot;);</span>
+<span class="nc" id="L135">                    Toast.makeText(this, &quot;Failed to load users&quot;, Toast.LENGTH_SHORT).show();</span>
+<span class="nc" id="L136">                }</span>
+        );
+
+<span class="nc" id="L139">        Volley.newRequestQueue(this).add(request);</span>
+<span class="nc" id="L140">    }</span>
+
+    /**
+     * Clears the current list and renders a card for each user returned from the
+     * backend response. Shows a fallback message if no users are available or if
+     * parsing fails.
+     *
+     * @param users the JSON array containing the users returned by the backend
+     */
+    private void bindUsers(JSONArray users) {
+<span class="nc" id="L150">        usersContainer.removeAllViews();</span>
+
+<span class="nc bnc" id="L152" title="All 4 branches missed.">        if (users == null || users.length() == 0) {</span>
+<span class="nc" id="L153">            addEmptyMessage(&quot;No users found&quot;);</span>
+<span class="nc" id="L154">            return;</span>
+        }
+
+        try {
+<span class="nc bnc" id="L158" title="All 2 branches missed.">            for (int i = 0; i &lt; users.length(); i++) {</span>
+<span class="nc" id="L159">                JSONObject user = users.getJSONObject(i);</span>
+
+<span class="nc" id="L161">                int listedUserId = getUserId(user);</span>
+<span class="nc" id="L162">                String listedUsername = user.optString(&quot;username&quot;, &quot;Unknown&quot;);</span>
+<span class="nc" id="L163">                int flagCount = user.optInt(&quot;flagCount&quot;, 0);</span>
+<span class="nc" id="L164">                String listedUserType = user.optString(&quot;userType&quot;, &quot;user&quot;);</span>
+
+<span class="nc" id="L166">                addUserCard(listedUserId, listedUsername, flagCount, listedUserType);</span>
+            }
+
+<span class="nc bnc" id="L169" title="All 2 branches missed.">            if (usersContainer.getChildCount() == 0) {</span>
+<span class="nc" id="L170">                addEmptyMessage(&quot;No users found&quot;);</span>
+            }
+
+<span class="nc" id="L173">        } catch (Exception e) {</span>
+<span class="nc" id="L174">            usersContainer.removeAllViews();</span>
+<span class="nc" id="L175">            addEmptyMessage(&quot;Failed to parse users&quot;);</span>
+<span class="nc" id="L176">            Toast.makeText(this, &quot;Failed to parse users&quot;, Toast.LENGTH_SHORT).show();</span>
+<span class="nc" id="L177">        }</span>
+<span class="nc" id="L178">    }</span>
+
+    /**
+     * Extracts the user ID from a user JSON object, checking both possible key names.
+     *
+     * @param user the JSON object representing a user
+     * @return the extracted user ID, or -1 if no valid ID is found
+     */
+    private int getUserId(JSONObject user) {
+<span class="nc bnc" id="L187" title="All 2 branches missed.">        if (user.has(&quot;id&quot;)) {</span>
+<span class="nc" id="L188">            return user.optInt(&quot;id&quot;, -1);</span>
+        }
+<span class="nc bnc" id="L190" title="All 2 branches missed.">        if (user.has(&quot;userId&quot;)) {</span>
+<span class="nc" id="L191">            return user.optInt(&quot;userId&quot;, -1);</span>
+        }
+<span class="nc" id="L193">        return -1;</span>
+    }
+
+    /**
+     * Adds a simple text message to the container when no users are found or when
+     * an error occurs.
+     *
+     * @param message the message to display to the user
+     */
+    private void addEmptyMessage(String message) {
+<span class="nc" id="L203">        TextView emptyView = new TextView(this);</span>
+<span class="nc" id="L204">        emptyView.setText(message);</span>
+<span class="nc" id="L205">        emptyView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);</span>
+<span class="nc" id="L206">        emptyView.setTextColor(0xFF666666);</span>
+
+<span class="nc" id="L208">        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(</span>
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+<span class="nc" id="L212">        params.topMargin = dp(10);</span>
+<span class="nc" id="L213">        emptyView.setLayoutParams(params);</span>
+
+<span class="nc" id="L215">        usersContainer.addView(emptyView);</span>
+<span class="nc" id="L216">    }</span>
+
+    /**
+     * Creates and adds a styled user card showing the username, user ID, flag count,
+     * and user type.
+     *
+     * @param listedUserId the ID of the user being displayed
+     * @param listedUsername the username of the user being displayed
+     * @param flagCount the number of flags associated with the user
+     * @param listedUserType the type or role of the user
+     */
+    private void addUserCard(int listedUserId, String listedUsername, int flagCount, String listedUserType) {
+<span class="nc" id="L228">        LinearLayout card = new LinearLayout(this);</span>
+<span class="nc" id="L229">        card.setOrientation(LinearLayout.VERTICAL);</span>
+<span class="nc" id="L230">        card.setBackgroundResource(R.drawable.bg_input);</span>
+<span class="nc" id="L231">        card.setPadding(dp(14), dp(14), dp(14), dp(14));</span>
+
+<span class="nc" id="L233">        LinearLayout.LayoutParams cardParams = new LinearLayout.LayoutParams(</span>
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+<span class="nc" id="L237">        cardParams.topMargin = dp(12);</span>
+<span class="nc" id="L238">        card.setLayoutParams(cardParams);</span>
+
+<span class="nc" id="L240">        TextView tvName = new TextView(this);</span>
+<span class="nc" id="L241">        tvName.setText(listedUsername);</span>
+<span class="nc" id="L242">        tvName.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);</span>
+<span class="nc" id="L243">        tvName.setTextColor(0xFF444444);</span>
+<span class="nc" id="L244">        tvName.setTypeface(null, Typeface.BOLD);</span>
+
+<span class="nc" id="L246">        TextView tvDetails = new TextView(this);</span>
+<span class="nc" id="L247">        tvDetails.setText(</span>
+                &quot;User ID: &quot; + listedUserId +
+                        &quot;\nFlag Count: &quot; + flagCount +
+                        &quot;\nUser Type: &quot; + listedUserType
+        );
+<span class="nc" id="L252">        tvDetails.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);</span>
+<span class="nc" id="L253">        tvDetails.setTextColor(0xFF666666);</span>
+<span class="nc" id="L254">        tvDetails.setGravity(Gravity.CENTER_VERTICAL);</span>
+
+<span class="nc" id="L256">        card.addView(tvName);</span>
+<span class="nc" id="L257">        card.addView(tvDetails);</span>
+
+<span class="nc" id="L259">        usersContainer.addView(card);</span>
+<span class="nc" id="L260">    }</span>
+
+    /**
+     * Converts a density-independent pixel value into its pixel equivalent for the
+     * current device display metrics
+     *
+     *
+     * @param value the density-independent pixel value to convert
+     * @return the equivalent pixel value as an integer
+     */
+    private int dp(int value) {
+<span class="nc" id="L271">        return (int) TypedValue.applyDimension(</span>
+                TypedValue.COMPLEX_UNIT_DIP,
+                value,
+<span class="nc" id="L274">                getResources().getDisplayMetrics()</span>
+        );
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span>Generated by the Android Gradle plugin 8.12.2</div></body></html>

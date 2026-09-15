@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/bg_input"
+    android:padding="14dp"
+    android:layout_marginTop="12dp">
+
+    <TextView
+        android:id="@+id/tv_report_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Post Title"
+        android:textColor="#444444"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/tv_report_details"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Post details"
+        android:textColor="#666666"
+        android:textSize="16sp"
+        android:layout_marginTop="6dp" />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btn_view_post"
+        android:layout_width="match_parent"
+        android:layout_height="52dp"
+        android:layout_marginTop="14dp"
+        android:text="View Post"
+        android:textAllCaps="false"
+        android:textSize="18sp"
+        android:textColor="#FFFFFF"
+        android:background="@drawable/bg_grey_rounded" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="10dp">
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_verify_post"
+            android:layout_width="0dp"
+            android:layout_height="52dp"
+            android:layout_weight="1"
+            android:layout_marginEnd="6dp"
+            android:text="Verify Post"
+            android:textAllCaps="false"
+            android:textSize="18sp"
+            android:textColor="#FFFFFF"
+            android:background="@drawable/bg_red_rounded" />
+
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_delete_post"
+            android:layout_width="0dp"
+            android:layout_height="52dp"
+            android:layout_weight="1"
+            android:layout_marginStart="6dp"
+            android:text="Ban Post"
+            android:textAllCaps="false"
+            android:textSize="18sp"
+            android:textColor="#FFFFFF"
+            android:background="@drawable/bg_red_rounded" />
+    </LinearLayout>
+
+</LinearLayout>

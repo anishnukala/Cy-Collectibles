@@ -1,0 +1,205 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > Posting</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">cycollectibles.Postings</a>
+</div>
+
+<h1>Coverage Summary for Class: Posting (cycollectibles.Postings)</h1>
+
+<table class="coverageStats">
+
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">Posting</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    46.7%
+  </span>
+  <span class="absValue">
+    (7/15)
+  </span>
+</td>
+</tr>
+  <tr>
+    <td class="name">Posting$HibernateInstantiator$0befWPNl</td>
+  </tr>
+  <tr>
+    <td class="name">Posting$HibernateProxy$16Q3bcSh</td>
+  </tr>
+<tr>
+  <td class="name"><strong>Total</strong></td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    46.7%
+  </span>
+  <span class="absValue">
+    (7/15)
+  </span>
+</td>
+</tr>
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package cycollectibles.Postings;
+&nbsp;
+&nbsp;import com.fasterxml.jackson.annotation.JsonIgnore;
+&nbsp;import com.fasterxml.jackson.annotation.JsonProperty;
+&nbsp;import jakarta.persistence.*;
+&nbsp;import cycollectibles.Users.User;
+&nbsp;import jakarta.validation.constraints.NotBlank;
+&nbsp;import jakarta.validation.constraints.Pattern;
+&nbsp;import jakarta.validation.constraints.Size;
+&nbsp;import lombok.Getter;
+&nbsp;import lombok.Setter;
+&nbsp;import org.hibernate.validator.constraints.UniqueElements;
+&nbsp;
+&nbsp;import java.util.Date;
+&nbsp;
+&nbsp;/**
+&nbsp; *
+&nbsp; * @author Vivek Bengre
+&nbsp; *
+&nbsp; */
+&nbsp;
+&nbsp;@Entity
+&nbsp;@Getter
+&nbsp;@Setter
+&nbsp;@Table(name = &quot;postings&quot;)
+&nbsp;public class Posting {
+<b class="fc">&nbsp;    public static Integer ACTIVE= 1;</b>
+<b class="fc">&nbsp;    public static Integer BANNED=0;</b>
+<b class="fc">&nbsp;    public static Integer COMPLETED = -1;</b>
+<b class="fc">&nbsp;    public static Integer REPORTED = 2;</b>
+<b class="fc">&nbsp;    public static Integer DELETED=3;</b>
+&nbsp;
+&nbsp;    /*
+&nbsp;     * The annotation @ID marks the field below as the primary key for the table created by springboot
+&nbsp;     * The @GeneratedValue generates a value if not already present, The strategy in this case is to start from 1 and increment for each table
+&nbsp;     */
+&nbsp;    @Id
+&nbsp;    @GeneratedValue(strategy = GenerationType.IDENTITY)
+&nbsp;    private Integer postingId;
+&nbsp;
+&nbsp;    @Column(nullable = false)
+&nbsp;    private String title;
+&nbsp;
+&nbsp;    @Column(nullable = false)
+&nbsp;    private String description;
+&nbsp;
+&nbsp;    @Column(nullable = false)
+&nbsp;    private int price;
+&nbsp;    /*
+&nbsp;     * Email annotation is part of the hibernate validator package that helps with validation of email
+&nbsp;     * input. In which case, it currently is matching to the regexp that expresses any characters are allowed followed by an &#39;@&#39; except for &#39;|&#39; and &#39;
+&nbsp;     * as they are potential SQL injection risk. Flag here is used to discern that input is not case-sensitive.
+&nbsp;     */
+&nbsp;    @Column(nullable = false)
+&nbsp;    private String genre;
+&nbsp;
+<b class="fc">&nbsp;    @Column(nullable = false)</b>
+&nbsp;    private Integer status =ACTIVE;
+&nbsp;
+&nbsp;    @Column(nullable = false)
+&nbsp;    private Date datePosted;
+&nbsp;
+&nbsp;    @Column(nullable = false)
+&nbsp;    private String imageUrl;
+&nbsp;
+&nbsp;    @ManyToOne(fetch = FetchType.LAZY)
+&nbsp;    @JoinColumn(name = &quot;seller_id&quot;,nullable=false)
+&nbsp;    private User seller;
+&nbsp;
+&nbsp;
+&nbsp;
+<b class="nc">&nbsp;    public Posting(String title, String description, int price, String genre, User seller) {</b>
+<b class="nc">&nbsp;        this.title = title;</b>
+<b class="nc">&nbsp;        this.description = description;</b>
+<b class="nc">&nbsp;        this.price = price;</b>
+<b class="nc">&nbsp;        this.genre = genre;</b>
+<b class="nc">&nbsp;        this.seller = seller;</b>
+<b class="nc">&nbsp;        this.datePosted = new Date();</b>
+<b class="nc">&nbsp;        this.status = ACTIVE;</b>
+&nbsp;    }
+&nbsp;
+<b class="fc">&nbsp;    public Posting() {</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    // =============================== Getters and Setters for each field ================================== //
+&nbsp;
+&nbsp;}
+&nbsp;
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-05-05 13:27</div>
+</div>
+</body>
+</html>

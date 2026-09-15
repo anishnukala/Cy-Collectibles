@@ -1,0 +1,375 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>FlagUsersActivity.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=0;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">debug</a> &gt; <a href="index.source.html" class="el_package">com.example.androidexample</a> &gt; <span class="el_source">FlagUsersActivity.java</span></div><h1>FlagUsersActivity.java</h1><pre class="source lang-java linenums">package com.example.androidexample;
+
+import android.app.AlertDialog;
+import android.content.Intent;
+import android.os.Bundle;
+import android.util.TypedValue;
+import android.view.Gravity;
+import android.view.LayoutInflater;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatButton;
+
+import com.android.volley.NetworkResponse;
+import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.toolbox.HttpHeaderParser;
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.nio.charset.Charset;
+import java.util.ArrayList;
+
+<span class="nc" id="L34">public class FlagUsersActivity extends AppCompatActivity {</span>
+
+    private static final String BASE_URL = BuildConfig.BASE_URL;
+
+<span class="nc" id="L38">    private int adminId = -1;</span>
+<span class="nc" id="L39">    private String loggedInUserType = &quot;&quot;;</span>
+
+    private Button close;
+    private Button flagBtn;
+    private RadioGroup usersRadioGroup;
+    private BottomNavigationView bottomNav;
+
+<span class="nc" id="L46">    private long userId = -1;</span>
+<span class="nc" id="L47">    private String username = &quot;&quot;;</span>
+<span class="nc" id="L48">    private String userType = &quot;&quot;;</span>
+
+<span class="nc" id="L50">    private final ArrayList&lt;Integer&gt; userIds = new ArrayList&lt;&gt;();</span>
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+<span class="nc" id="L54">        super.onCreate(savedInstanceState);</span>
+<span class="nc" id="L55">        setContentView(R.layout.activity_flag_user);</span>
+
+<span class="nc" id="L57">        userId = getIntent().getLongExtra(&quot;USER_ID&quot;, -1);</span>
+<span class="nc" id="L58">        username = getIntent().getStringExtra(&quot;USERNAME&quot;);</span>
+<span class="nc" id="L59">        userType = getIntent().getStringExtra(&quot;USERTYPE&quot;);</span>
+
+<span class="nc bnc" id="L61" title="All 2 branches missed.">        if (username == null) username = &quot;&quot;;</span>
+<span class="nc bnc" id="L62" title="All 2 branches missed.">        if (userType == null) userType = &quot;&quot;;</span>
+
+<span class="nc" id="L64">        adminId = (int) userId;</span>
+<span class="nc" id="L65">        loggedInUserType = userType;</span>
+
+<span class="nc" id="L67">        close = findViewById(R.id.btn_close);</span>
+<span class="nc" id="L68">        flagBtn = findViewById(R.id.btn_flag_selected);</span>
+<span class="nc" id="L69">        usersRadioGroup = findViewById(R.id.users_radio_group);</span>
+<span class="nc" id="L70">        bottomNav = findViewById(R.id.bottom_nav);</span>
+
+<span class="nc" id="L72">        close.setOnClickListener(v -&gt; finish());</span>
+
+<span class="nc" id="L74">        setupBottomNav();</span>
+
+<span class="nc" id="L76">        flagBtn.setOnClickListener(v -&gt; {</span>
+<span class="nc bnc" id="L77" title="All 2 branches missed.">            if (adminId == -1) {</span>
+<span class="nc" id="L78">                Toast.makeText(this, &quot;Missing admin id&quot;, Toast.LENGTH_SHORT).show();</span>
+<span class="nc" id="L79">                return;</span>
+            }
+
+<span class="nc bnc" id="L82" title="All 2 branches missed.">            if (!&quot;admin&quot;.equalsIgnoreCase(loggedInUserType)) {</span>
+<span class="nc" id="L83">                Toast.makeText(this, &quot;Logged in user is not admin&quot;, Toast.LENGTH_SHORT).show();</span>
+<span class="nc" id="L84">                return;</span>
+            }
+
+<span class="nc" id="L87">            int checkedId = usersRadioGroup.getCheckedRadioButtonId();</span>
+
+<span class="nc bnc" id="L89" title="All 2 branches missed.">            if (checkedId == -1) {</span>
+<span class="nc" id="L90">                Toast.makeText(this, &quot;Select one user&quot;, Toast.LENGTH_SHORT).show();</span>
+<span class="nc" id="L91">                return;</span>
+            }
+
+<span class="nc" id="L94">            int selectedIndex = usersRadioGroup.indexOfChild(usersRadioGroup.findViewById(checkedId));</span>
+
+<span class="nc bnc" id="L96" title="All 4 branches missed.">            if (selectedIndex &lt; 0 || selectedIndex &gt;= userIds.size()) {</span>
+<span class="nc" id="L97">                Toast.makeText(this, &quot;Invalid selected user&quot;, Toast.LENGTH_SHORT).show();</span>
+<span class="nc" id="L98">                return;</span>
+            }
+
+<span class="nc" id="L101">            int selectedUserId = userIds.get(selectedIndex);</span>
+
+<span class="nc bnc" id="L103" title="All 2 branches missed.">            if (selectedUserId == adminId) {</span>
+<span class="nc" id="L104">                Toast.makeText(this, &quot;Admin cannot flag themselves&quot;, Toast.LENGTH_SHORT).show();</span>
+<span class="nc" id="L105">                return;</span>
+            }
+
+<span class="nc" id="L108">            RadioButton selectedRadio = usersRadioGroup.findViewById(checkedId);</span>
+<span class="nc bnc" id="L109" title="All 2 branches missed.">            String selectedUserLabel = selectedRadio != null</span>
+<span class="nc" id="L110">                    ? selectedRadio.getText().toString().split(&quot;\n&quot;)[0]</span>
+<span class="nc" id="L111">                    : &quot;this user&quot;;</span>
+
+<span class="nc" id="L113">            showFlagReasonDialog(selectedUserId, selectedUserLabel);</span>
+<span class="nc" id="L114">        });</span>
+
+<span class="nc" id="L116">        loadUsers();</span>
+<span class="nc" id="L117">    }</span>
+
+    @Override
+    protected void onResume() {
+<span class="nc" id="L121">        super.onResume();</span>
+<span class="nc" id="L122">        loadUsers();</span>
+<span class="nc" id="L123">    }</span>
+
+    private void setupBottomNav() {
+<span class="nc bnc" id="L126" title="All 2 branches missed.">        if (bottomNav == null) return;</span>
+
+<span class="nc" id="L128">        bottomNav.setSelectedItemId(R.id.nav_users);</span>
+
+<span class="nc" id="L130">        bottomNav.setOnItemSelectedListener(item -&gt; {</span>
+<span class="nc" id="L131">            int id = item.getItemId();</span>
+
+<span class="nc bnc" id="L133" title="All 2 branches missed.">            if (id == R.id.nav_dashboard) {</span>
+<span class="nc" id="L134">                Intent intent = new Intent(FlagUsersActivity.this, AdminHomeActivity.class);</span>
+<span class="nc" id="L135">                intent.putExtra(&quot;USER_ID&quot;, userId);</span>
+<span class="nc" id="L136">                intent.putExtra(&quot;USERNAME&quot;, username);</span>
+<span class="nc" id="L137">                intent.putExtra(&quot;USERTYPE&quot;, userType);</span>
+<span class="nc" id="L138">                startActivity(intent);</span>
+<span class="nc" id="L139">                overridePendingTransition(0, 0);</span>
+<span class="nc" id="L140">                finish();</span>
+<span class="nc" id="L141">                return true;</span>
+<span class="nc bnc" id="L142" title="All 2 branches missed.">            } else if (id == R.id.nav_banned) {</span>
+<span class="nc" id="L143">                Intent intent = new Intent(FlagUsersActivity.this, BannedUserActivity.class);</span>
+<span class="nc" id="L144">                intent.putExtra(&quot;USER_ID&quot;, userId);</span>
+<span class="nc" id="L145">                intent.putExtra(&quot;USERNAME&quot;, username);</span>
+<span class="nc" id="L146">                intent.putExtra(&quot;USERTYPE&quot;, userType);</span>
+<span class="nc" id="L147">                startActivity(intent);</span>
+<span class="nc" id="L148">                overridePendingTransition(0, 0);</span>
+<span class="nc" id="L149">                finish();</span>
+<span class="nc" id="L150">                return true;</span>
+<span class="nc bnc" id="L151" title="All 2 branches missed.">            } else if (id == R.id.nav_users) {</span>
+<span class="nc" id="L152">                return true;</span>
+            }
+
+<span class="nc" id="L155">            return false;</span>
+        });
+<span class="nc" id="L157">    }</span>
+
+    private void loadUsers() {
+<span class="nc" id="L160">        String url = BASE_URL + &quot;/users&quot;;</span>
+
+<span class="nc" id="L162">        JsonArrayRequest request = new JsonArrayRequest(</span>
+                Request.Method.GET,
+                url,
+                null,
+                this::bindUsers,
+<span class="nc" id="L167">                error -&gt; Toast.makeText(this, &quot;Failed to load users&quot;, Toast.LENGTH_SHORT).show()</span>
+        );
+
+<span class="nc" id="L170">        Volley.newRequestQueue(this).add(request);</span>
+<span class="nc" id="L171">    }</span>
+
+    private void bindUsers(JSONArray users) {
+<span class="nc" id="L174">        usersRadioGroup.removeAllViews();</span>
+<span class="nc" id="L175">        userIds.clear();</span>
+
+<span class="nc bnc" id="L177" title="All 4 branches missed.">        if (users == null || users.length() == 0) {</span>
+<span class="nc" id="L178">            TextView emptyView = new TextView(this);</span>
+<span class="nc" id="L179">            emptyView.setText(&quot;No active users found&quot;);</span>
+<span class="nc" id="L180">            emptyView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);</span>
+<span class="nc" id="L181">            emptyView.setTextColor(0xFF666666);</span>
+<span class="nc" id="L182">            usersRadioGroup.addView(emptyView);</span>
+<span class="nc" id="L183">            return;</span>
+        }
+
+        try {
+<span class="nc bnc" id="L187" title="All 2 branches missed.">            for (int i = 0; i &lt; users.length(); i++) {</span>
+<span class="nc" id="L188">                JSONObject user = users.getJSONObject(i);</span>
+
+<span class="nc" id="L190">                int listedUserId = getUserId(user);</span>
+<span class="nc" id="L191">                String listedUsername = user.optString(&quot;username&quot;, &quot;Unknown&quot;);</span>
+<span class="nc" id="L192">                int flagCount = user.optInt(&quot;flagCount&quot;, 0);</span>
+<span class="nc" id="L193">                String listedUserType = user.optString(&quot;userType&quot;, &quot;&quot;);</span>
+
+<span class="nc bnc" id="L195" title="All 2 branches missed.">                if (listedUserId == -1) continue;</span>
+<span class="nc bnc" id="L196" title="All 2 branches missed.">                if (&quot;admin&quot;.equalsIgnoreCase(listedUserType)) continue;</span>
+<span class="nc bnc" id="L197" title="All 2 branches missed.">                if (listedUserId == adminId) continue;</span>
+
+<span class="nc" id="L199">                addUserRow(listedUserId, listedUsername, flagCount);</span>
+            }
+
+<span class="nc bnc" id="L202" title="All 2 branches missed.">            if (userIds.isEmpty()) {</span>
+<span class="nc" id="L203">                TextView emptyView = new TextView(this);</span>
+<span class="nc" id="L204">                emptyView.setText(&quot;No non-admin active users found&quot;);</span>
+<span class="nc" id="L205">                emptyView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);</span>
+<span class="nc" id="L206">                emptyView.setTextColor(0xFF666666);</span>
+<span class="nc" id="L207">                usersRadioGroup.addView(emptyView);</span>
+            }
+
+<span class="nc" id="L210">        } catch (Exception e) {</span>
+<span class="nc" id="L211">            Toast.makeText(this, &quot;Failed to parse users&quot;, Toast.LENGTH_SHORT).show();</span>
+<span class="nc" id="L212">        }</span>
+<span class="nc" id="L213">    }</span>
+
+    private int getUserId(JSONObject user) {
+<span class="nc bnc" id="L216" title="All 2 branches missed.">        if (user.has(&quot;id&quot;)) return user.optInt(&quot;id&quot;, -1);</span>
+<span class="nc bnc" id="L217" title="All 2 branches missed.">        if (user.has(&quot;userId&quot;)) return user.optInt(&quot;userId&quot;, -1);</span>
+<span class="nc" id="L218">        return -1;</span>
+    }
+
+    private void addUserRow(int targetUserId, String usernameValue, int flagCount) {
+<span class="nc" id="L222">        RadioButton radioButton = new RadioButton(this);</span>
+<span class="nc" id="L223">        radioButton.setText(usernameValue + &quot;\nFlag count: &quot; + flagCount);</span>
+<span class="nc" id="L224">        radioButton.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);</span>
+<span class="nc" id="L225">        radioButton.setTextColor(0xFF444444);</span>
+<span class="nc" id="L226">        radioButton.setGravity(Gravity.CENTER_VERTICAL);</span>
+<span class="nc" id="L227">        radioButton.setPadding(dp(14), dp(14), dp(14), dp(14));</span>
+<span class="nc" id="L228">        radioButton.setBackgroundResource(R.drawable.bg_input);</span>
+
+<span class="nc" id="L230">        RadioGroup.LayoutParams params = new RadioGroup.LayoutParams(</span>
+                RadioGroup.LayoutParams.MATCH_PARENT,
+                RadioGroup.LayoutParams.WRAP_CONTENT
+        );
+<span class="nc" id="L234">        params.topMargin = dp(10);</span>
+<span class="nc" id="L235">        radioButton.setLayoutParams(params);</span>
+
+<span class="nc" id="L237">        usersRadioGroup.addView(radioButton);</span>
+<span class="nc" id="L238">        userIds.add(targetUserId);</span>
+<span class="nc" id="L239">    }</span>
+
+    private void showFlagReasonDialog(int targetUserId, String targetUsername) {
+<span class="nc" id="L242">        LayoutInflater inflater = LayoutInflater.from(this);</span>
+<span class="nc" id="L243">        android.view.View dialogView = inflater.inflate(R.layout.dialog_flag_user_reason, null);</span>
+
+<span class="nc" id="L245">        TextView tvDialogTitle = dialogView.findViewById(R.id.tv_dialog_title);</span>
+<span class="nc" id="L246">        TextView tvDialogSubtitle = dialogView.findViewById(R.id.tv_dialog_subtitle);</span>
+<span class="nc" id="L247">        EditText etReason = dialogView.findViewById(R.id.et_flag_reason_dialog);</span>
+<span class="nc" id="L248">        TextView btnCancel = dialogView.findViewById(R.id.btn_cancel_flag);</span>
+<span class="nc" id="L249">        AppCompatButton btnFlag = dialogView.findViewById(R.id.btn_confirm_flag);</span>
+
+<span class="nc" id="L251">        tvDialogTitle.setText(&quot;Flag user&quot;);</span>
+<span class="nc" id="L252">        tvDialogSubtitle.setText(&quot;Enter a reason for flagging \&quot;&quot; + targetUsername + &quot;\&quot;&quot;);</span>
+
+<span class="nc" id="L254">        AlertDialog dialog = new AlertDialog.Builder(this)</span>
+<span class="nc" id="L255">                .setView(dialogView)</span>
+<span class="nc" id="L256">                .create();</span>
+
+<span class="nc bnc" id="L258" title="All 2 branches missed.">        if (dialog.getWindow() != null) {</span>
+<span class="nc" id="L259">            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);</span>
+        }
+
+<span class="nc" id="L262">        btnCancel.setOnClickListener(v -&gt; dialog.dismiss());</span>
+
+<span class="nc" id="L264">        btnFlag.setOnClickListener(v -&gt; {</span>
+<span class="nc" id="L265">            String reasonText = etReason.getText().toString().trim();</span>
+
+<span class="nc bnc" id="L267" title="All 2 branches missed.">            if (reasonText.isEmpty()) {</span>
+<span class="nc" id="L268">                etReason.setError(&quot;Reason is required&quot;);</span>
+<span class="nc" id="L269">                return;</span>
+            }
+
+<span class="nc" id="L272">            dialog.dismiss();</span>
+<span class="nc" id="L273">            showConfirmDialog(targetUserId, reasonText);</span>
+<span class="nc" id="L274">        });</span>
+
+<span class="nc" id="L276">        dialog.show();</span>
+<span class="nc" id="L277">    }</span>
+
+    private void showConfirmDialog(int targetUserId, String reasonText) {
+<span class="nc" id="L280">        new AlertDialog.Builder(this)</span>
+<span class="nc" id="L281">                .setTitle(&quot;Confirm flag&quot;)</span>
+<span class="nc" id="L282">                .setMessage(&quot;Flag this user?&quot;)</span>
+<span class="nc" id="L283">                .setPositiveButton(&quot;Yes&quot;, (dialog, which) -&gt; flagUser(targetUserId, reasonText))</span>
+<span class="nc" id="L284">                .setNegativeButton(&quot;No&quot;, null)</span>
+<span class="nc" id="L285">                .show();</span>
+<span class="nc" id="L286">    }</span>
+
+    private void flagUser(int targetUserId, String reasonText) {
+<span class="nc" id="L289">        String url = BASE_URL + &quot;/flag/user/&quot; + adminId + &quot;/&quot; + targetUserId;</span>
+
+<span class="nc" id="L291">        JSONObject body = new JSONObject();</span>
+        try {
+<span class="nc" id="L293">            body.put(&quot;message&quot;, reasonText);</span>
+<span class="nc" id="L294">        } catch (Exception e) {</span>
+<span class="nc" id="L295">            e.printStackTrace();</span>
+<span class="nc" id="L296">        }</span>
+
+<span class="nc" id="L298">        JsonObjectRequest request = new JsonObjectRequest(</span>
+                Request.Method.PATCH,
+                url,
+                body,
+                response -&gt; {
+<span class="nc" id="L303">                    Toast.makeText(this, &quot;User flagged successfully&quot;, Toast.LENGTH_SHORT).show();</span>
+<span class="nc" id="L304">                    usersRadioGroup.clearCheck();</span>
+<span class="nc" id="L305">                    loadUsers();</span>
+<span class="nc" id="L306">                },</span>
+                error -&gt; {
+<span class="nc bnc" id="L308" title="All 2 branches missed.">                    if (error.networkResponse != null) {</span>
+<span class="nc" id="L309">                        int code = error.networkResponse.statusCode;</span>
+
+<span class="nc bnc" id="L311" title="All 2 branches missed.">                        if (code == 403) {</span>
+<span class="nc" id="L312">                            Toast.makeText(this, &quot;Only admin can flag users&quot;, Toast.LENGTH_SHORT).show();</span>
+<span class="nc bnc" id="L313" title="All 2 branches missed.">                        } else if (code == 404) {</span>
+<span class="nc" id="L314">                            Toast.makeText(this, &quot;Admin or user not found&quot;, Toast.LENGTH_SHORT).show();</span>
+<span class="nc bnc" id="L315" title="All 2 branches missed.">                        } else if (code == 409) {</span>
+<span class="nc" id="L316">                            Toast.makeText(this, &quot;User already inactive or cannot be flagged&quot;, Toast.LENGTH_SHORT).show();</span>
+<span class="nc bnc" id="L317" title="All 2 branches missed.">                        } else if (code == 415) {</span>
+<span class="nc" id="L318">                            Toast.makeText(this, &quot;Unsupported media type&quot;, Toast.LENGTH_SHORT).show();</span>
+                        } else {
+<span class="nc" id="L320">                            Toast.makeText(this, &quot;Failed to flag user (&quot; + code + &quot;)&quot;, Toast.LENGTH_SHORT).show();</span>
+                        }
+<span class="nc" id="L322">                    } else {</span>
+<span class="nc" id="L323">                        Toast.makeText(this, &quot;Network error&quot;, Toast.LENGTH_SHORT).show();</span>
+                    }
+<span class="nc" id="L325">                }</span>
+<span class="nc" id="L326">        ) {</span>
+            @Override
+            public String getBodyContentType() {
+<span class="nc" id="L329">                return &quot;application/json; charset=utf-8&quot;;</span>
+            }
+
+            @Override
+            protected Response&lt;JSONObject&gt; parseNetworkResponse(NetworkResponse response) {
+                try {
+<span class="nc bnc" id="L335" title="All 2 branches missed.">                    String jsonString = response.data == null</span>
+<span class="nc" id="L336">                            ? &quot;&quot;</span>
+<span class="nc" id="L337">                            : new String(</span>
+                            response.data,
+<span class="nc" id="L339">                            Charset.forName(</span>
+<span class="nc" id="L340">                                    HttpHeaderParser.parseCharset(response.headers, &quot;utf-8&quot;)</span>
+                            )
+                    );
+
+<span class="nc bnc" id="L344" title="All 2 branches missed.">                    if (jsonString.isEmpty()) {</span>
+<span class="nc" id="L345">                        return Response.success(</span>
+                                new JSONObject(),
+<span class="nc" id="L347">                                HttpHeaderParser.parseCacheHeaders(response)</span>
+                        );
+                    }
+
+<span class="nc" id="L351">                    return Response.success(</span>
+                            new JSONObject(jsonString),
+<span class="nc" id="L353">                            HttpHeaderParser.parseCacheHeaders(response)</span>
+                    );
+<span class="nc" id="L355">                } catch (Exception e) {</span>
+<span class="nc" id="L356">                    return Response.success(</span>
+                            new JSONObject(),
+<span class="nc" id="L358">                            HttpHeaderParser.parseCacheHeaders(response)</span>
+                    );
+                }
+            }
+        };
+
+<span class="nc" id="L364">        Volley.newRequestQueue(this).add(request);</span>
+<span class="nc" id="L365">    }</span>
+
+    private int dp(int value) {
+<span class="nc" id="L368">        return (int) TypedValue.applyDimension(</span>
+                TypedValue.COMPLEX_UNIT_DIP,
+                value,
+<span class="nc" id="L371">                getResources().getDisplayMetrics()</span>
+        );
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span>Generated by the Android Gradle plugin 8.12.2</div></body></html>

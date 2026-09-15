@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>UserSearchAdapter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=0;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">debug</a> &gt; <a href="index.source.html" class="el_package">com.example.androidexample</a> &gt; <span class="el_source">UserSearchAdapter.java</span></div><h1>UserSearchAdapter.java</h1><pre class="source lang-java linenums">package com.example.androidexample;
+
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
+import java.util.ArrayList;
+
+public class UserSearchAdapter extends RecyclerView.Adapter&lt;UserSearchAdapter.UserViewHolder&gt; {
+
+    public interface OnUserClickListener {
+        void onUserClicked(UserSearchItem user);
+    }
+
+    private final ArrayList&lt;UserSearchItem&gt; users;
+    private final OnUserClickListener listener;
+    private final boolean multiSelect;
+
+<span class="fc" id="L24">    private int singleSelectedUserId = -1;</span>
+<span class="fc" id="L25">    private ArrayList&lt;UserSearchItem&gt; selectedUsers = new ArrayList&lt;&gt;();</span>
+
+<span class="fc" id="L27">    public UserSearchAdapter(ArrayList&lt;UserSearchItem&gt; users, OnUserClickListener listener, boolean multiSelect) {</span>
+<span class="fc" id="L28">        this.users = users;</span>
+<span class="fc" id="L29">        this.listener = listener;</span>
+<span class="fc" id="L30">        this.multiSelect = multiSelect;</span>
+<span class="fc" id="L31">    }</span>
+
+    public void setSingleSelectedUserId(int singleSelectedUserId) {
+<span class="fc" id="L34">        this.singleSelectedUserId = singleSelectedUserId;</span>
+<span class="fc" id="L35">    }</span>
+
+    public void setSelectedUsers(ArrayList&lt;UserSearchItem&gt; selectedUsers) {
+<span class="fc" id="L38">        this.selectedUsers = selectedUsers;</span>
+<span class="fc" id="L39">    }</span>
+
+    @NonNull
+    @Override
+    public UserViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+<span class="fc" id="L44">        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_user_search, parent, false);</span>
+<span class="fc" id="L45">        return new UserViewHolder(view);</span>
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull UserViewHolder holder, int position) {
+<span class="fc" id="L50">        UserSearchItem user = users.get(position);</span>
+
+<span class="fc" id="L52">        holder.txtUsername.setText(user.getUsername());</span>
+<span class="fc" id="L53">        holder.txtDetails.setText(user.getUserType() + &quot; • &quot; + user.getEmail());</span>
+<span class="fc" id="L54">        holder.avatarImage.setImageResource(R.drawable.direct);</span>
+
+        boolean isSelected;
+<span class="fc bfc" id="L57" title="All 2 branches covered.">        if (multiSelect) {</span>
+<span class="fc" id="L58">            isSelected = false;</span>
+<span class="fc bfc" id="L59" title="All 2 branches covered.">            for (UserSearchItem selected : selectedUsers) {</span>
+<span class="fc bfc" id="L60" title="All 2 branches covered.">                if (selected.getId() == user.getId()) {</span>
+<span class="fc" id="L61">                    isSelected = true;</span>
+<span class="fc" id="L62">                    break;</span>
+                }
+<span class="fc" id="L64">            }</span>
+        } else {
+<span class="fc bfc" id="L66" title="All 2 branches covered.">            isSelected = user.getId() == singleSelectedUserId;</span>
+        }
+
+<span class="fc bfc" id="L69" title="All 2 branches covered.">        holder.selectionView.setVisibility(isSelected ? View.VISIBLE : View.INVISIBLE);</span>
+
+<span class="fc" id="L71">        holder.itemView.setOnClickListener(v -&gt; {</span>
+<span class="pc bpc" id="L72" title="1 of 2 branches missed.">            if (listener != null) {</span>
+<span class="fc" id="L73">                listener.onUserClicked(user);</span>
+            }
+<span class="fc" id="L75">        });</span>
+<span class="fc" id="L76">    }</span>
+
+    @Override
+    public int getItemCount() {
+<span class="pc bpc" id="L80" title="1 of 2 branches missed.">        return users == null ? 0 : users.size();</span>
+    }
+
+    static class UserViewHolder extends RecyclerView.ViewHolder {
+        ImageView avatarImage;
+        TextView txtUsername;
+        TextView txtDetails;
+        View selectionView;
+
+        public UserViewHolder(@NonNull View itemView) {
+<span class="fc" id="L90">            super(itemView);</span>
+<span class="fc" id="L91">            avatarImage = itemView.findViewById(R.id.img_user_avatar);</span>
+<span class="fc" id="L92">            txtUsername = itemView.findViewById(R.id.txt_user_username);</span>
+<span class="fc" id="L93">            txtDetails = itemView.findViewById(R.id.txt_user_details);</span>
+<span class="fc" id="L94">            selectionView = itemView.findViewById(R.id.view_selected_marker);</span>
+<span class="fc" id="L95">        }</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span>Generated by the Android Gradle plugin 8.12.2</div></body></html>

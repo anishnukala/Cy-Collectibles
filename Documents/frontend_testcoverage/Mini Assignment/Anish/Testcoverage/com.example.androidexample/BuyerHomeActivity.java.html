@@ -1,0 +1,535 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BuyerHomeActivity.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=0;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">debug</a> &gt; <a href="index.source.html" class="el_package">com.example.androidexample</a> &gt; <span class="el_source">BuyerHomeActivity.java</span></div><h1>BuyerHomeActivity.java</h1><pre class="source lang-java linenums">package com.example.androidexample;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Typeface;
+import android.net.Uri;
+import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.TypedValue;
+import android.view.Gravity;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.PopupMenu;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.android.volley.Request;
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.Volley;
+import com.bumptech.glide.Glide;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+import org.json.JSONObject;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Locale;
+
+<span class="nc" id="L35">public class BuyerHomeActivity extends AppCompatActivity {</span>
+
+    private LinearLayout listContainer;
+    private Button btnCategory;
+    private Button btnSort;
+    private EditText etSearch;
+
+<span class="nc" id="L42">    private String selectedGenre = null;</span>
+<span class="nc" id="L43">    private String sortField = &quot;datePosted&quot;;</span>
+<span class="nc" id="L44">    private String sortDir = &quot;desc&quot;;</span>
+<span class="nc" id="L45">    private String searchQuery = &quot;&quot;;</span>
+
+<span class="nc" id="L47">    private final List&lt;String&gt; genres = new ArrayList&lt;&gt;();</span>
+<span class="nc" id="L48">    private final List&lt;JSONObject&gt; allPostings = new ArrayList&lt;&gt;();</span>
+
+<span class="nc" id="L50">    private long userId = -1;</span>
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+<span class="nc" id="L54">        super.onCreate(savedInstanceState);</span>
+<span class="nc" id="L55">        setContentView(R.layout.activity_buyer_home);</span>
+
+<span class="nc" id="L57">        SharedPreferences prefs = getSharedPreferences(&quot;AUTH&quot;, MODE_PRIVATE);</span>
+<span class="nc" id="L58">        userId = prefs.getLong(&quot;USER_ID&quot;, -1);</span>
+
+<span class="nc bnc" id="L60" title="All 2 branches missed.">        if (userId == -1) {</span>
+<span class="nc" id="L61">            forceLogoutToLogin(&quot;Session expired. Please login again.&quot;);</span>
+<span class="nc" id="L62">            return;</span>
+        }
+
+<span class="nc" id="L65">        NotificationSocketManager.getInstance().connect(this, userId);</span>
+
+<span class="nc" id="L67">        ImageButton profileBtn = findViewById(R.id.btn_profile);</span>
+<span class="nc" id="L68">        BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);</span>
+
+<span class="nc" id="L70">        listContainer = findViewById(R.id.list_container);</span>
+<span class="nc" id="L71">        btnCategory = findViewById(R.id.btn_category);</span>
+<span class="nc" id="L72">        btnSort = findViewById(R.id.btn_sort);</span>
+<span class="nc" id="L73">        etSearch = findViewById(R.id.et_search);</span>
+
+<span class="nc bnc" id="L75" title="All 2 branches missed.">        if (profileBtn != null) {</span>
+<span class="nc" id="L76">            profileBtn.setOnClickListener(v -&gt;</span>
+<span class="nc" id="L77">                    startActivity(new Intent(BuyerHomeActivity.this, UserProfileActivity.class))</span>
+            );
+        }
+
+<span class="nc bnc" id="L81" title="All 2 branches missed.">        if (bottomNav != null) {</span>
+<span class="nc" id="L82">            bottomNav.setSelectedItemId(R.id.nav_buyer_postings);</span>
+
+<span class="nc" id="L84">            bottomNav.setOnItemSelectedListener(item -&gt; {</span>
+<span class="nc" id="L85">                int id = item.getItemId();</span>
+
+<span class="nc bnc" id="L87" title="All 2 branches missed.">                if (id == R.id.nav_buyer_postings) {</span>
+<span class="nc" id="L88">                    return true;</span>
+<span class="nc bnc" id="L89" title="All 2 branches missed.">                } else if (id == R.id.nav_buyer_cart) {</span>
+<span class="nc" id="L90">                    startActivity(new Intent(BuyerHomeActivity.this, CartActivity.class));</span>
+<span class="nc" id="L91">                    overridePendingTransition(0, 0);</span>
+<span class="nc" id="L92">                    return true;</span>
+<span class="nc bnc" id="L93" title="All 2 branches missed.">                } else if (id == R.id.nav_buyer_transactions) {</span>
+<span class="nc" id="L94">                    startActivity(new Intent(BuyerHomeActivity.this, BuyerTransactionsActivity.class));</span>
+<span class="nc" id="L95">                    overridePendingTransition(0, 0);</span>
+<span class="nc" id="L96">                    return true;</span>
+<span class="nc bnc" id="L97" title="All 2 branches missed.">                } else if (id == R.id.nav_buyer_chat) {</span>
+<span class="nc" id="L98">                    startActivity(new Intent(BuyerHomeActivity.this, ChatHomeActivity.class));</span>
+<span class="nc" id="L99">                    overridePendingTransition(0, 0);</span>
+<span class="nc" id="L100">                    return true;</span>
+                }
+
+<span class="nc" id="L103">                return false;</span>
+            });
+        }
+
+<span class="nc bnc" id="L107" title="All 2 branches missed.">        if (btnCategory != null) {</span>
+<span class="nc" id="L108">            btnCategory.setOnClickListener(v -&gt; showCategoryMenu());</span>
+        }
+
+<span class="nc bnc" id="L111" title="All 2 branches missed.">        if (btnSort != null) {</span>
+<span class="nc" id="L112">            btnSort.setOnClickListener(v -&gt; showSortMenu());</span>
+        }
+
+<span class="nc bnc" id="L115" title="All 2 branches missed.">        if (etSearch != null) {</span>
+<span class="nc" id="L116">            etSearch.addTextChangedListener(new TextWatcher() {</span>
+                @Override
+<span class="nc" id="L118">                public void beforeTextChanged(CharSequence s, int start, int count, int after) { }</span>
+
+                @Override
+                public void onTextChanged(CharSequence s, int start, int before, int count) {
+<span class="nc" id="L122">                    searchQuery = s.toString().trim();</span>
+<span class="nc" id="L123">                    filterAndRenderPostings();</span>
+<span class="nc" id="L124">                }</span>
+
+                @Override
+<span class="nc" id="L127">                public void afterTextChanged(Editable s) { }</span>
+            });
+        }
+
+<span class="nc" id="L131">        getWindow().setStatusBarColor(android.graphics.Color.WHITE);</span>
+
+<span class="nc bnc" id="L133" title="All 2 branches missed.">        if (android.os.Build.VERSION.SDK_INT &gt;= android.os.Build.VERSION_CODES.M) {</span>
+<span class="nc" id="L134">            getWindow().getDecorView().setSystemUiVisibility(</span>
+                    android.view.View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+            );
+        }
+
+<span class="nc" id="L139">        loadGenres();</span>
+<span class="nc" id="L140">        loadPostings();</span>
+<span class="nc" id="L141">    }</span>
+
+    @Override
+    protected void onResume() {
+<span class="nc" id="L145">        super.onResume();</span>
+
+<span class="nc" id="L147">        SharedPreferences prefs = getSharedPreferences(&quot;AUTH&quot;, MODE_PRIVATE);</span>
+<span class="nc" id="L148">        userId = prefs.getLong(&quot;USER_ID&quot;, -1);</span>
+
+<span class="nc bnc" id="L150" title="All 2 branches missed.">        if (userId == -1) {</span>
+<span class="nc" id="L151">            forceLogoutToLogin(&quot;Session expired. Please login again.&quot;);</span>
+<span class="nc" id="L152">            return;</span>
+        }
+
+<span class="nc" id="L155">        NotificationSocketManager.getInstance().connect(this, userId);</span>
+
+<span class="nc" id="L157">        BottomNavigationView bottomNav = findViewById(R.id.bottom_navigation);</span>
+<span class="nc bnc" id="L158" title="All 2 branches missed.">        if (bottomNav != null) {</span>
+<span class="nc" id="L159">            bottomNav.setSelectedItemId(R.id.nav_buyer_postings);</span>
+        }
+<span class="nc" id="L161">    }</span>
+
+    private void forceLogoutToLogin(String message) {
+<span class="nc" id="L164">        SharedPreferences prefs = getSharedPreferences(&quot;AUTH&quot;, MODE_PRIVATE);</span>
+<span class="nc" id="L165">        prefs.edit().clear().apply();</span>
+
+<span class="nc" id="L167">        Toast.makeText(this, message, Toast.LENGTH_LONG).show();</span>
+
+<span class="nc" id="L169">        Intent intent = new Intent(BuyerHomeActivity.this, LoginActivity.class);</span>
+<span class="nc" id="L170">        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);</span>
+<span class="nc" id="L171">        startActivity(intent);</span>
+<span class="nc" id="L172">        finish();</span>
+<span class="nc" id="L173">    }</span>
+
+    private boolean handleAuthError(int statusCode) {
+<span class="nc bnc" id="L176" title="All 2 branches missed.">        if (statusCode == 403) {</span>
+<span class="nc" id="L177">            forceLogoutToLogin(&quot;Your account has been banned or is no longer active.&quot;);</span>
+<span class="nc" id="L178">            return true;</span>
+        }
+<span class="nc" id="L180">        return false;</span>
+    }
+
+    private void loadGenres() {
+<span class="nc" id="L184">        String url = BuildConfig.BASE_URL + &quot;/postings/genre&quot;;</span>
+
+<span class="nc" id="L186">        JsonArrayRequest req = new JsonArrayRequest(</span>
+                Request.Method.GET,
+                url,
+                null,
+                arr -&gt; {
+<span class="nc" id="L191">                    genres.clear();</span>
+<span class="nc" id="L192">                    genres.add(&quot;All&quot;);</span>
+
+<span class="nc bnc" id="L194" title="All 2 branches missed.">                    if (arr != null) {</span>
+<span class="nc bnc" id="L195" title="All 2 branches missed.">                        for (int i = 0; i &lt; arr.length(); i++) {</span>
+<span class="nc" id="L196">                            String g = arr.optString(i, &quot;&quot;).trim();</span>
+<span class="nc bnc" id="L197" title="All 2 branches missed.">                            if (!g.isEmpty()) {</span>
+<span class="nc" id="L198">                                genres.add(g);</span>
+                            }
+                        }
+                    }
+<span class="nc" id="L202">                },</span>
+                error -&gt; {
+<span class="nc bnc" id="L204" title="All 2 branches missed.">                    int status = (error.networkResponse != null)</span>
+<span class="nc" id="L205">                            ? error.networkResponse.statusCode : -1;</span>
+
+<span class="nc bnc" id="L207" title="All 2 branches missed.">                    if (handleAuthError(status)) return;</span>
+
+<span class="nc" id="L209">                    Toast.makeText(this,</span>
+                            &quot;Failed to load genres (&quot; + status + &quot;)&quot;,
+<span class="nc" id="L211">                            Toast.LENGTH_SHORT).show();</span>
+<span class="nc" id="L212">                }</span>
+        );
+
+<span class="nc" id="L215">        Volley.newRequestQueue(this).add(req);</span>
+<span class="nc" id="L216">    }</span>
+
+    private void showCategoryMenu() {
+<span class="nc bnc" id="L219" title="All 2 branches missed.">        if (genres.isEmpty()) {</span>
+<span class="nc" id="L220">            Toast.makeText(this, &quot;Genres not loaded yet&quot;, Toast.LENGTH_SHORT).show();</span>
+<span class="nc" id="L221">            return;</span>
+        }
+
+<span class="nc" id="L224">        PopupMenu menu = new PopupMenu(this, btnCategory);</span>
+
+<span class="nc bnc" id="L226" title="All 2 branches missed.">        for (String g : genres) {</span>
+<span class="nc" id="L227">            menu.getMenu().add(g);</span>
+<span class="nc" id="L228">        }</span>
+
+<span class="nc" id="L230">        menu.setOnMenuItemClickListener(item -&gt; {</span>
+<span class="nc" id="L231">            String choice = item.getTitle().toString();</span>
+
+<span class="nc bnc" id="L233" title="All 2 branches missed.">            if (&quot;All&quot;.equals(choice)) {</span>
+<span class="nc" id="L234">                selectedGenre = null;</span>
+<span class="nc" id="L235">                btnCategory.setText(&quot;Category&quot;);</span>
+            } else {
+<span class="nc" id="L237">                selectedGenre = choice;</span>
+<span class="nc" id="L238">                btnCategory.setText(choice);</span>
+            }
+
+<span class="nc" id="L241">            loadPostings();</span>
+<span class="nc" id="L242">            return true;</span>
+        });
+
+<span class="nc" id="L245">        menu.show();</span>
+<span class="nc" id="L246">    }</span>
+
+    private void showSortMenu() {
+<span class="nc" id="L249">        PopupMenu menu = new PopupMenu(this, btnSort);</span>
+<span class="nc" id="L250">        menu.getMenu().add(&quot;Newest&quot;);</span>
+<span class="nc" id="L251">        menu.getMenu().add(&quot;Oldest&quot;);</span>
+<span class="nc" id="L252">        menu.getMenu().add(&quot;Price: Low to High&quot;);</span>
+<span class="nc" id="L253">        menu.getMenu().add(&quot;Price: High to Low&quot;);</span>
+<span class="nc" id="L254">        menu.getMenu().add(&quot;Title: A-Z&quot;);</span>
+<span class="nc" id="L255">        menu.getMenu().add(&quot;Title: Z-A&quot;);</span>
+
+<span class="nc" id="L257">        menu.setOnMenuItemClickListener(item -&gt; {</span>
+<span class="nc" id="L258">            String choice = item.getTitle().toString();</span>
+
+<span class="nc bnc" id="L260" title="All 26 branches missed.">            switch (choice) {</span>
+                case &quot;Newest&quot;:
+<span class="nc" id="L262">                    sortField = &quot;datePosted&quot;;</span>
+<span class="nc" id="L263">                    sortDir = &quot;desc&quot;;</span>
+<span class="nc" id="L264">                    break;</span>
+                case &quot;Oldest&quot;:
+<span class="nc" id="L266">                    sortField = &quot;datePosted&quot;;</span>
+<span class="nc" id="L267">                    sortDir = &quot;asc&quot;;</span>
+<span class="nc" id="L268">                    break;</span>
+                case &quot;Price: Low to High&quot;:
+<span class="nc" id="L270">                    sortField = &quot;price&quot;;</span>
+<span class="nc" id="L271">                    sortDir = &quot;asc&quot;;</span>
+<span class="nc" id="L272">                    break;</span>
+                case &quot;Price: High to Low&quot;:
+<span class="nc" id="L274">                    sortField = &quot;price&quot;;</span>
+<span class="nc" id="L275">                    sortDir = &quot;desc&quot;;</span>
+<span class="nc" id="L276">                    break;</span>
+                case &quot;Title: A-Z&quot;:
+<span class="nc" id="L278">                    sortField = &quot;title&quot;;</span>
+<span class="nc" id="L279">                    sortDir = &quot;asc&quot;;</span>
+<span class="nc" id="L280">                    break;</span>
+                case &quot;Title: Z-A&quot;:
+<span class="nc" id="L282">                    sortField = &quot;title&quot;;</span>
+<span class="nc" id="L283">                    sortDir = &quot;desc&quot;;</span>
+                    break;
+            }
+
+<span class="nc" id="L287">            btnSort.setText(choice);</span>
+<span class="nc" id="L288">            loadPostings();</span>
+<span class="nc" id="L289">            return true;</span>
+        });
+
+<span class="nc" id="L292">        menu.show();</span>
+<span class="nc" id="L293">    }</span>
+
+    private void loadPostings() {
+<span class="nc" id="L296">        Uri.Builder builder = Uri.parse(BuildConfig.BASE_URL + &quot;/postings&quot;).buildUpon();</span>
+
+<span class="nc bnc" id="L298" title="All 4 branches missed.">        if (selectedGenre != null &amp;&amp; !selectedGenre.trim().isEmpty()) {</span>
+<span class="nc" id="L299">            builder.appendQueryParameter(&quot;genre&quot;, selectedGenre.trim());</span>
+        }
+
+<span class="nc" id="L302">        builder.appendQueryParameter(&quot;sort&quot;, sortField + &quot;,&quot; + sortDir);</span>
+
+<span class="nc" id="L304">        String url = builder.build().toString();</span>
+
+<span class="nc" id="L306">        JsonArrayRequest req = new JsonArrayRequest(</span>
+                Request.Method.GET,
+                url,
+                null,
+                arr -&gt; {
+<span class="nc" id="L311">                    allPostings.clear();</span>
+
+<span class="nc bnc" id="L313" title="All 2 branches missed.">                    if (arr != null) {</span>
+<span class="nc bnc" id="L314" title="All 2 branches missed.">                        for (int i = 0; i &lt; arr.length(); i++) {</span>
+<span class="nc" id="L315">                            JSONObject obj = arr.optJSONObject(i);</span>
+<span class="nc bnc" id="L316" title="All 2 branches missed.">                            if (obj != null) {</span>
+<span class="nc" id="L317">                                allPostings.add(obj);</span>
+                            }
+                        }
+                    }
+
+<span class="nc" id="L322">                    filterAndRenderPostings();</span>
+<span class="nc" id="L323">                },</span>
+                error -&gt; {
+<span class="nc bnc" id="L325" title="All 2 branches missed.">                    int status = (error.networkResponse != null)</span>
+<span class="nc" id="L326">                            ? error.networkResponse.statusCode : -1;</span>
+<span class="nc bnc" id="L327" title="All 2 branches missed.">                    String msg = (error.getMessage() != null)</span>
+<span class="nc" id="L328">                            ? error.getMessage() : &quot;Network error&quot;;</span>
+
+<span class="nc bnc" id="L330" title="All 2 branches missed.">                    if (handleAuthError(status)) return;</span>
+
+<span class="nc" id="L332">                    Toast.makeText(this,</span>
+                            &quot;Failed to load (&quot; + status + &quot;): &quot; + msg,
+<span class="nc" id="L334">                            Toast.LENGTH_LONG).show();</span>
+<span class="nc" id="L335">                }</span>
+        );
+
+<span class="nc" id="L338">        Volley.newRequestQueue(this).add(req);</span>
+<span class="nc" id="L339">    }</span>
+
+    private void filterAndRenderPostings() {
+<span class="nc bnc" id="L342" title="All 2 branches missed.">        if (listContainer == null) return;</span>
+
+<span class="nc" id="L344">        listContainer.removeAllViews();</span>
+
+<span class="nc" id="L346">        List&lt;JSONObject&gt; filtered = new ArrayList&lt;&gt;();</span>
+<span class="nc bnc" id="L347" title="All 2 branches missed.">        String query = searchQuery == null ? &quot;&quot; : searchQuery.toLowerCase(Locale.getDefault());</span>
+
+<span class="nc bnc" id="L349" title="All 2 branches missed.">        for (JSONObject o : allPostings) {</span>
+<span class="nc" id="L350">            String title = o.optString(&quot;title&quot;, &quot;&quot;).toLowerCase(Locale.getDefault());</span>
+<span class="nc" id="L351">            String genre = o.optString(&quot;genre&quot;, &quot;&quot;).toLowerCase(Locale.getDefault());</span>
+<span class="nc" id="L352">            String description = o.optString(&quot;description&quot;, &quot;&quot;).toLowerCase(Locale.getDefault());</span>
+
+<span class="nc" id="L354">            boolean matchesSearch =</span>
+<span class="nc bnc" id="L355" title="All 2 branches missed.">                    query.isEmpty()</span>
+<span class="nc bnc" id="L356" title="All 2 branches missed.">                            || title.contains(query)</span>
+<span class="nc bnc" id="L357" title="All 2 branches missed.">                            || genre.contains(query)</span>
+<span class="nc bnc" id="L358" title="All 2 branches missed.">                            || description.contains(query);</span>
+
+<span class="nc bnc" id="L360" title="All 2 branches missed.">            if (matchesSearch) {</span>
+<span class="nc" id="L361">                filtered.add(o);</span>
+            }
+<span class="nc" id="L363">        }</span>
+
+<span class="nc bnc" id="L365" title="All 2 branches missed.">        if (filtered.isEmpty()) {</span>
+<span class="nc" id="L366">            TextView tv = new TextView(this);</span>
+<span class="nc" id="L367">            tv.setText(&quot;No matching listings found.&quot;);</span>
+<span class="nc" id="L368">            tv.setTextSize(18);</span>
+<span class="nc" id="L369">            tv.setGravity(Gravity.CENTER_HORIZONTAL);</span>
+<span class="nc" id="L370">            listContainer.addView(tv);</span>
+<span class="nc" id="L371">            return;</span>
+        }
+
+<span class="nc bnc" id="L374" title="All 2 branches missed.">        for (JSONObject o : filtered) {</span>
+<span class="nc" id="L375">            renderSinglePosting(o);</span>
+<span class="nc" id="L376">        }</span>
+<span class="nc" id="L377">    }</span>
+
+    private void renderSinglePosting(JSONObject o) {
+<span class="nc" id="L380">        String title = o.optString(&quot;title&quot;, &quot;Untitled&quot;);</span>
+<span class="nc" id="L381">        String genre = o.optString(&quot;genre&quot;, &quot;&quot;);</span>
+<span class="nc" id="L382">        int price = o.optInt(&quot;price&quot;, 0);</span>
+<span class="nc" id="L383">        String imageUrl = o.optString(&quot;imageUrl&quot;, &quot;&quot;);</span>
+<span class="nc" id="L384">        int postingId = o.optInt(&quot;postingId&quot;, -1);</span>
+
+<span class="nc" id="L386">        String fullImageUrl = BuildConfig.BASE_URL + &quot;/&quot; + imageUrl;</span>
+
+<span class="nc" id="L388">        LinearLayout card = new LinearLayout(this);</span>
+<span class="nc" id="L389">        card.setOrientation(LinearLayout.HORIZONTAL);</span>
+<span class="nc" id="L390">        card.setPadding(dp(12), dp(12), dp(12), dp(12));</span>
+
+<span class="nc" id="L392">        LinearLayout.LayoutParams cardLp = new LinearLayout.LayoutParams(</span>
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+<span class="nc" id="L396">        cardLp.bottomMargin = dp(14);</span>
+<span class="nc" id="L397">        card.setLayoutParams(cardLp);</span>
+<span class="nc" id="L398">        card.setBackgroundResource(R.drawable.bg_card);</span>
+
+<span class="nc" id="L400">        ImageView img = new ImageView(this);</span>
+<span class="nc" id="L401">        LinearLayout.LayoutParams imgLp = new LinearLayout.LayoutParams(dp(72), dp(72));</span>
+<span class="nc" id="L402">        img.setLayoutParams(imgLp);</span>
+<span class="nc" id="L403">        img.setScaleType(ImageView.ScaleType.CENTER_CROP);</span>
+<span class="nc" id="L404">        card.addView(img);</span>
+
+<span class="nc" id="L406">        LinearLayout right = new LinearLayout(this);</span>
+<span class="nc" id="L407">        right.setOrientation(LinearLayout.VERTICAL);</span>
+<span class="nc" id="L408">        LinearLayout.LayoutParams rightLp = new LinearLayout.LayoutParams(</span>
+                0,
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                1f
+        );
+<span class="nc" id="L413">        rightLp.leftMargin = dp(12);</span>
+<span class="nc" id="L414">        right.setLayoutParams(rightLp);</span>
+
+<span class="nc" id="L416">        TextView tvTitle = new TextView(this);</span>
+<span class="nc" id="L417">        tvTitle.setText(title);</span>
+<span class="nc" id="L418">        tvTitle.setTextSize(18);</span>
+<span class="nc" id="L419">        tvTitle.setTextColor(0xFF444444);</span>
+<span class="nc" id="L420">        tvTitle.setTypeface(tvTitle.getTypeface(), Typeface.BOLD);</span>
+
+<span class="nc" id="L422">        TextView tvMeta = new TextView(this);</span>
+<span class="nc" id="L423">        tvMeta.setText(genre + &quot; • $&quot; + price);</span>
+<span class="nc" id="L424">        tvMeta.setTextSize(14);</span>
+<span class="nc" id="L425">        tvMeta.setTextColor(0xFF555555);</span>
+
+<span class="nc" id="L427">        LinearLayout buttonRow = new LinearLayout(this);</span>
+<span class="nc" id="L428">        buttonRow.setOrientation(LinearLayout.HORIZONTAL);</span>
+<span class="nc" id="L429">        LinearLayout.LayoutParams buttonRowLp = new LinearLayout.LayoutParams(</span>
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+<span class="nc" id="L433">        buttonRowLp.topMargin = dp(10);</span>
+<span class="nc" id="L434">        buttonRow.setLayoutParams(buttonRowLp);</span>
+
+<span class="nc" id="L436">        Button btnDetails = new Button(this);</span>
+<span class="nc" id="L437">        LinearLayout.LayoutParams detailsLp = new LinearLayout.LayoutParams(</span>
+                0,
+<span class="nc" id="L439">                dp(36),</span>
+                1f
+        );
+<span class="nc" id="L442">        detailsLp.rightMargin = dp(8);</span>
+<span class="nc" id="L443">        btnDetails.setLayoutParams(detailsLp);</span>
+<span class="nc" id="L444">        btnDetails.setText(&quot;Item Detail&quot;);</span>
+<span class="nc" id="L445">        btnDetails.setTransformationMethod(null);</span>
+<span class="nc" id="L446">        btnDetails.setTextColor(0xFFFFFFFF);</span>
+<span class="nc" id="L447">        btnDetails.setTextSize(12);</span>
+<span class="nc" id="L448">        btnDetails.setBackgroundResource(R.drawable.bg_red_rounded);</span>
+
+<span class="nc" id="L450">        btnDetails.setOnClickListener(v -&gt; {</span>
+<span class="nc" id="L451">            Intent intent = new Intent(BuyerHomeActivity.this, ItemDetailActivity.class);</span>
+<span class="nc" id="L452">            intent.putExtra(&quot;postingId&quot;, postingId);</span>
+<span class="nc" id="L453">            startActivity(intent);</span>
+<span class="nc" id="L454">        });</span>
+
+<span class="nc" id="L456">        Button btnAddToCart = new Button(this);</span>
+<span class="nc" id="L457">        LinearLayout.LayoutParams cartBtnLp = new LinearLayout.LayoutParams(</span>
+                0,
+<span class="nc" id="L459">                dp(36),</span>
+                1f
+        );
+<span class="nc" id="L462">        btnAddToCart.setLayoutParams(cartBtnLp);</span>
+<span class="nc" id="L463">        btnAddToCart.setText(&quot;Add to Cart&quot;);</span>
+<span class="nc" id="L464">        btnAddToCart.setTransformationMethod(null);</span>
+<span class="nc" id="L465">        btnAddToCart.setTextColor(0xFFFFFFFF);</span>
+<span class="nc" id="L466">        btnAddToCart.setTextSize(12);</span>
+<span class="nc" id="L467">        btnAddToCart.setBackgroundResource(R.drawable.bg_grey_rounded);</span>
+
+<span class="nc" id="L469">        btnAddToCart.setOnClickListener(v -&gt; addToCart(o));</span>
+
+<span class="nc" id="L471">        buttonRow.addView(btnDetails);</span>
+<span class="nc" id="L472">        buttonRow.addView(btnAddToCart);</span>
+
+<span class="nc" id="L474">        right.addView(tvTitle);</span>
+<span class="nc" id="L475">        right.addView(tvMeta);</span>
+<span class="nc" id="L476">        right.addView(buttonRow);</span>
+
+<span class="nc" id="L478">        card.addView(right);</span>
+<span class="nc" id="L479">        listContainer.addView(card);</span>
+
+<span class="nc" id="L481">        Glide.with(this)</span>
+<span class="nc" id="L482">                .load(fullImageUrl)</span>
+<span class="nc" id="L483">                .placeholder(android.R.drawable.picture_frame)</span>
+<span class="nc" id="L484">                .error(android.R.drawable.ic_dialog_alert)</span>
+<span class="nc" id="L485">                .into(img);</span>
+<span class="nc" id="L486">    }</span>
+
+    private void addToCart(JSONObject posting) {
+<span class="nc" id="L489">        SharedPreferences prefs = getSharedPreferences(&quot;AUTH&quot;, MODE_PRIVATE);</span>
+<span class="nc" id="L490">        long currentUserId = prefs.getLong(&quot;USER_ID&quot;, -1);</span>
+
+<span class="nc bnc" id="L492" title="All 2 branches missed.">        if (currentUserId == -1) {</span>
+<span class="nc" id="L493">            forceLogoutToLogin(&quot;Session expired. Please login again.&quot;);</span>
+<span class="nc" id="L494">            return;</span>
+        }
+
+<span class="nc" id="L497">        int postingId = posting.optInt(&quot;postingId&quot;, -1);</span>
+<span class="nc" id="L498">        String title = posting.optString(&quot;title&quot;, &quot;Item&quot;);</span>
+
+<span class="nc bnc" id="L500" title="All 2 branches missed.">        if (postingId == -1) {</span>
+<span class="nc" id="L501">            Toast.makeText(this, &quot;Invalid posting id&quot;, Toast.LENGTH_SHORT).show();</span>
+<span class="nc" id="L502">            return;</span>
+        }
+
+<span class="nc" id="L505">        CartManager.addToCart(this, currentUserId, postingId,</span>
+<span class="nc" id="L506">                response -&gt; Toast.makeText(this, &quot;Added to cart: &quot; + title, Toast.LENGTH_SHORT).show(),</span>
+                error -&gt; {
+<span class="nc bnc" id="L508" title="All 2 branches missed.">                    if (error.networkResponse != null) {</span>
+<span class="nc" id="L509">                        int status = error.networkResponse.statusCode;</span>
+
+<span class="nc bnc" id="L511" title="All 2 branches missed.">                        if (status == 403) {</span>
+<span class="nc" id="L512">                            forceLogoutToLogin(&quot;Your account has been banned or is no longer active.&quot;);</span>
+<span class="nc bnc" id="L513" title="All 2 branches missed.">                        } else if (status == 409) {</span>
+<span class="nc" id="L514">                            Toast.makeText(this, &quot;Item already in cart or unavailable&quot;, Toast.LENGTH_SHORT).show();</span>
+<span class="nc bnc" id="L515" title="All 2 branches missed.">                        } else if (status == 404) {</span>
+<span class="nc" id="L516">                            Toast.makeText(this, &quot;User or posting not found&quot;, Toast.LENGTH_SHORT).show();</span>
+                        } else {
+<span class="nc" id="L518">                            Toast.makeText(this, &quot;Failed to add to cart (&quot; + status + &quot;)&quot;, Toast.LENGTH_SHORT).show();</span>
+                        }
+<span class="nc" id="L520">                    } else {</span>
+<span class="nc" id="L521">                        Toast.makeText(this, &quot;Network error while adding to cart&quot;, Toast.LENGTH_SHORT).show();</span>
+                    }
+<span class="nc" id="L523">                }</span>
+        );
+<span class="nc" id="L525">    }</span>
+
+    private int dp(int value) {
+<span class="nc" id="L528">        return (int) TypedValue.applyDimension(</span>
+                TypedValue.COMPLEX_UNIT_DIP,
+                value,
+<span class="nc" id="L531">                getResources().getDisplayMetrics()</span>
+        );
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span>Generated by the Android Gradle plugin 8.12.2</div></body></html>

@@ -1,0 +1,315 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/edit_user_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#FFFFFF">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:background="#B30000"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/btn_close"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="X"
+            android:textColor="#FFFFFF"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true" />
+    </RelativeLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Edit User Details"
+                android:textSize="34sp"
+                android:textStyle="bold"
+                android:textColor="#555555"
+                android:layout_marginBottom="8dp" />
+
+            <!-- Username Section -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_input"
+                android:padding="14dp"
+                android:layout_marginTop="8dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Username"
+                            android:textColor="#444444"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tv_username_value"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="username"
+                            android:textColor="#666666"
+                            android:textSize="18sp"
+                            android:layout_marginTop="4dp" />
+                    </LinearLayout>
+
+                    <ImageView
+                        android:id="@+id/btn_edit_username"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:src="@android:drawable/ic_menu_edit"
+                        android:contentDescription="Edit username"
+                        android:padding="4dp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/layout_username_editor"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    android:layout_marginTop="12dp">
+
+                    <EditText
+                        android:id="@+id/edit_username"
+                        android:layout_width="match_parent"
+                        android:layout_height="54dp"
+                        android:background="@drawable/bg_input"
+                        android:hint="New Username"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
+                        android:textSize="18sp"
+                        android:inputType="text" />
+
+                    <Button
+                        android:id="@+id/btn_save_username"
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:layout_marginTop="12dp"
+                        android:text="Save Username"
+                        android:textAllCaps="false"
+                        android:textSize="20sp"
+                        android:textColor="#FFFFFF"
+                        android:background="@drawable/bg_red_rounded"
+                        android:backgroundTint="@null"
+                        app:backgroundTint="@null" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Email Section -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_input"
+                android:padding="14dp"
+                android:layout_marginTop="12dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Email"
+                            android:textColor="#444444"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tv_email_value"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="email@example.com"
+                            android:textColor="#666666"
+                            android:textSize="18sp"
+                            android:layout_marginTop="4dp" />
+                    </LinearLayout>
+
+                    <ImageView
+                        android:id="@+id/btn_edit_email"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:src="@android:drawable/ic_menu_edit"
+                        android:contentDescription="Edit email"
+                        android:padding="4dp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/layout_email_editor"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    android:layout_marginTop="12dp">
+
+                    <EditText
+                        android:id="@+id/edit_email"
+                        android:layout_width="match_parent"
+                        android:layout_height="54dp"
+                        android:background="@drawable/bg_input"
+                        android:hint="New Email"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
+                        android:textSize="18sp"
+                        android:inputType="textEmailAddress" />
+
+                    <Button
+                        android:id="@+id/btn_save_email"
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:layout_marginTop="12dp"
+                        android:text="Save Email"
+                        android:textAllCaps="false"
+                        android:textSize="20sp"
+                        android:textColor="#FFFFFF"
+                        android:background="@drawable/bg_red_rounded"
+                        android:backgroundTint="@null"
+                        app:backgroundTint="@null" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Password Section -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/bg_input"
+                android:padding="14dp"
+                android:layout_marginTop="12dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Password"
+                            android:textColor="#444444"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Tap pencil to change password"
+                            android:textColor="#666666"
+                            android:textSize="18sp"
+                            android:layout_marginTop="4dp" />
+                    </LinearLayout>
+
+                    <ImageView
+                        android:id="@+id/btn_edit_password"
+                        android:layout_width="32dp"
+                        android:layout_height="32dp"
+                        android:src="@android:drawable/ic_menu_edit"
+                        android:contentDescription="Edit password"
+                        android:padding="4dp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/layout_password_editor"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:visibility="gone"
+                    android:layout_marginTop="12dp">
+
+                    <EditText
+                        android:id="@+id/edit_old_password"
+                        android:layout_width="match_parent"
+                        android:layout_height="54dp"
+                        android:background="@drawable/bg_input"
+                        android:hint="Old Password"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
+                        android:textSize="18sp"
+                        android:inputType="textPassword" />
+
+                    <EditText
+                        android:id="@+id/edit_new_password"
+                        android:layout_width="match_parent"
+                        android:layout_height="54dp"
+                        android:layout_marginTop="12dp"
+                        android:background="@drawable/bg_input"
+                        android:hint="New Password"
+                        android:paddingStart="16dp"
+                        android:paddingEnd="16dp"
+                        android:textSize="18sp"
+                        android:inputType="textPassword" />
+
+                    <Button
+                        android:id="@+id/btn_save_password"
+                        android:layout_width="match_parent"
+                        android:layout_height="56dp"
+                        android:layout_marginTop="12dp"
+                        android:text="Save Password"
+                        android:textAllCaps="false"
+                        android:textSize="20sp"
+                        android:textColor="#FFFFFF"
+                        android:background="@drawable/bg_red_rounded"
+                        android:backgroundTint="@null"
+                        app:backgroundTint="@null" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="16dp"
+                android:text="" />
+
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <color name="red_primary">#B00000</color>
+    <color name="grey_button">#CFCFCF</color>
+
+    <color name="input_stroke">#E3E3E3</color>
+    <color name="input_hint">#BDBDBD</color>
+
+    <color name="text_dark">#2B2B2B</color>
+
+</resources>

@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CommentAdapter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=0;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">debug</a> &gt; <a href="index.source.html" class="el_package">com.example.androidexample</a> &gt; <span class="el_source">CommentAdapter.java</span></div><h1>CommentAdapter.java</h1><pre class="source lang-java linenums">package com.example.androidexample;
+
+import android.content.Context;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
+
+public class CommentAdapter extends RecyclerView.Adapter&lt;CommentAdapter.CommentViewHolder&gt; {
+
+    public interface OnReplyClickListener {
+        void onReplyClick(CommentItem comment);
+        void onInlineReplySubmit(CommentItem comment, String replyText);
+        void onInlineReplyCancel();
+    }
+
+    private final Context context;
+    private final ArrayList&lt;CommentItem&gt; comments;
+    private final OnReplyClickListener listener;
+
+<span class="nc" id="L32">    public CommentAdapter(Context context, ArrayList&lt;CommentItem&gt; comments, OnReplyClickListener listener) {</span>
+<span class="nc" id="L33">        this.context = context;</span>
+<span class="nc" id="L34">        this.comments = comments;</span>
+<span class="nc" id="L35">        this.listener = listener;</span>
+<span class="nc" id="L36">    }</span>
+
+    @NonNull
+    @Override
+    public CommentViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+<span class="nc" id="L41">        View view = LayoutInflater.from(context).inflate(R.layout.item_comment, parent, false);</span>
+<span class="nc" id="L42">        return new CommentViewHolder(view);</span>
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull CommentViewHolder holder, int position) {
+<span class="nc" id="L47">        CommentItem comment = comments.get(position);</span>
+
+<span class="nc" id="L49">        holder.tvUsername.setText(comment.getSenderUsername());</span>
+<span class="nc" id="L50">        holder.tvContent.setText(comment.getContent());</span>
+<span class="nc" id="L51">        holder.tvDate.setText(formatDate(comment.getCreatedAt()));</span>
+
+<span class="nc bnc" id="L53" title="All 2 branches missed.">        holder.replyBoxContainer.setVisibility(comment.isReplyTarget() ? View.VISIBLE : View.GONE);</span>
+
+<span class="nc" id="L55">        holder.btnReply.setOnClickListener(v -&gt; listener.onReplyClick(comment));</span>
+<span class="nc" id="L56">        holder.btnCancelInlineReply.setOnClickListener(v -&gt; listener.onInlineReplyCancel());</span>
+
+<span class="nc" id="L58">        holder.btnSendInlineReply.setOnClickListener(v -&gt; {</span>
+<span class="nc" id="L59">            String replyText = holder.etInlineReply.getText().toString().trim();</span>
+<span class="nc" id="L60">            listener.onInlineReplySubmit(comment, replyText);</span>
+<span class="nc" id="L61">        });</span>
+
+<span class="nc bnc" id="L63" title="All 2 branches missed.">        if (comment.getReplies().isEmpty()) {</span>
+<span class="nc" id="L64">            holder.btnShowReplies.setVisibility(View.GONE);</span>
+<span class="nc" id="L65">            holder.repliesContainer.setVisibility(View.GONE);</span>
+<span class="nc" id="L66">            holder.repliesInnerContainer.removeAllViews();</span>
+        } else {
+<span class="nc" id="L68">            holder.btnShowReplies.setVisibility(View.VISIBLE);</span>
+
+<span class="nc bnc" id="L70" title="All 2 branches missed.">            if (comment.isRepliesExpanded()) {</span>
+<span class="nc" id="L71">                holder.btnShowReplies.setText(&quot;Hide replies (&quot; + comment.getReplies().size() + &quot;)&quot;);</span>
+<span class="nc" id="L72">                holder.repliesContainer.setVisibility(View.VISIBLE);</span>
+<span class="nc" id="L73">                renderReplies(holder.repliesInnerContainer, comment.getReplies());</span>
+            } else {
+<span class="nc" id="L75">                holder.btnShowReplies.setText(&quot;Show replies (&quot; + comment.getReplies().size() + &quot;)&quot;);</span>
+<span class="nc" id="L76">                holder.repliesContainer.setVisibility(View.GONE);</span>
+<span class="nc" id="L77">                holder.repliesInnerContainer.removeAllViews();</span>
+            }
+
+<span class="nc" id="L80">            holder.btnShowReplies.setOnClickListener(v -&gt; {</span>
+<span class="nc bnc" id="L81" title="All 2 branches missed.">                comment.setRepliesExpanded(!comment.isRepliesExpanded());</span>
+
+<span class="nc" id="L83">                int pos = holder.getAdapterPosition();</span>
+<span class="nc bnc" id="L84" title="All 2 branches missed.">                if (pos != RecyclerView.NO_POSITION) {</span>
+<span class="nc" id="L85">                    notifyItemChanged(pos);</span>
+                }
+<span class="nc" id="L87">            });</span>
+        }
+<span class="nc" id="L89">    }</span>
+
+    private void renderReplies(LinearLayout container, ArrayList&lt;CommentItem&gt; replies) {
+<span class="nc" id="L92">        container.removeAllViews();</span>
+
+<span class="nc bnc" id="L94" title="All 2 branches missed.">        for (int i = 0; i &lt; replies.size(); i++) {</span>
+<span class="nc" id="L95">            CommentItem reply = replies.get(i);</span>
+
+<span class="nc" id="L97">            LinearLayout layout = new LinearLayout(context);</span>
+<span class="nc" id="L98">            layout.setOrientation(LinearLayout.VERTICAL);</span>
+<span class="nc" id="L99">            layout.setPadding(0, 10, 0, 12);</span>
+
+<span class="nc" id="L101">            LinearLayout header = new LinearLayout(context);</span>
+<span class="nc" id="L102">            header.setOrientation(LinearLayout.HORIZONTAL);</span>
+<span class="nc" id="L103">            header.setGravity(android.view.Gravity.CENTER_VERTICAL);</span>
+
+<span class="nc" id="L105">            TextView username = new TextView(context);</span>
+<span class="nc" id="L106">            username.setText(reply.getSenderUsername());</span>
+<span class="nc" id="L107">            username.setTextColor(0xFF111111);</span>
+<span class="nc" id="L108">            username.setTextSize(14);</span>
+<span class="nc" id="L109">            username.setTypeface(null, android.graphics.Typeface.BOLD);</span>
+<span class="nc" id="L110">            username.setLayoutParams(new LinearLayout.LayoutParams(</span>
+                    0,
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    1
+            ));
+
+<span class="nc" id="L116">            TextView date = new TextView(context);</span>
+<span class="nc" id="L117">            date.setText(formatDate(reply.getCreatedAt()));</span>
+<span class="nc" id="L118">            date.setTextColor(0xFF888888);</span>
+<span class="nc" id="L119">            date.setTextSize(10);</span>
+
+<span class="nc" id="L121">            header.addView(username);</span>
+<span class="nc" id="L122">            header.addView(date);</span>
+
+<span class="nc" id="L124">            TextView content = new TextView(context);</span>
+<span class="nc" id="L125">            content.setText(reply.getContent());</span>
+<span class="nc" id="L126">            content.setTextColor(0xFF333333);</span>
+<span class="nc" id="L127">            content.setTextSize(14);</span>
+<span class="nc" id="L128">            content.setPadding(0, 6, 0, 8);</span>
+
+<span class="nc" id="L130">            layout.addView(header);</span>
+<span class="nc" id="L131">            layout.addView(content);</span>
+
+<span class="nc bnc" id="L133" title="All 2 branches missed.">            if (i &lt; replies.size() - 1) {</span>
+<span class="nc" id="L134">                View divider = new View(context);</span>
+<span class="nc" id="L135">                divider.setLayoutParams(new LinearLayout.LayoutParams(</span>
+                        ViewGroup.LayoutParams.MATCH_PARENT,
+                        1
+                ));
+<span class="nc" id="L139">                divider.setBackgroundColor(0xFFE3E3E3);</span>
+<span class="nc" id="L140">                layout.addView(divider);</span>
+            }
+
+<span class="nc" id="L143">            container.addView(layout);</span>
+        }
+<span class="nc" id="L145">    }</span>
+
+    private String formatDate(String raw) {
+        try {
+<span class="nc bnc" id="L149" title="All 4 branches missed.">            if (raw == null || raw.trim().isEmpty()) {</span>
+<span class="nc" id="L150">                return &quot;&quot;;</span>
+            }
+
+<span class="nc" id="L153">            SimpleDateFormat input = new SimpleDateFormat(&quot;yyyy-MM-dd'T'HH:mm:ss.SSSXXX&quot;, Locale.US);</span>
+<span class="nc" id="L154">            SimpleDateFormat output = new SimpleDateFormat(&quot;MMM dd, yyyy&quot;, Locale.US);</span>
+
+<span class="nc" id="L156">            Date date = input.parse(raw);</span>
+<span class="nc bnc" id="L157" title="All 2 branches missed.">            return date != null ? output.format(date) : &quot;&quot;;</span>
+<span class="nc" id="L158">        } catch (Exception e) {</span>
+<span class="nc" id="L159">            return &quot;&quot;;</span>
+        }
+    }
+
+    public void setReplyTarget(Integer commentId) {
+<span class="nc bnc" id="L164" title="All 2 branches missed.">        for (CommentItem comment : comments) {</span>
+<span class="nc bnc" id="L165" title="All 4 branches missed.">            comment.setReplyTarget(commentId != null &amp;&amp; comment.getCommentId() == commentId);</span>
+<span class="nc" id="L166">        }</span>
+<span class="nc" id="L167">        notifyDataSetChanged();</span>
+<span class="nc" id="L168">    }</span>
+
+    @Override
+    public int getItemCount() {
+<span class="nc" id="L172">        return comments.size();</span>
+    }
+
+    static class CommentViewHolder extends RecyclerView.ViewHolder {
+        TextView tvUsername;
+        TextView tvContent;
+        TextView tvDate;
+        TextView btnReply;
+        TextView btnShowReplies;
+
+        LinearLayout replyBoxContainer;
+        LinearLayout repliesContainer;
+        LinearLayout repliesInnerContainer;
+
+        EditText etInlineReply;
+        Button btnCancelInlineReply;
+        Button btnSendInlineReply;
+
+        public CommentViewHolder(@NonNull View itemView) {
+<span class="nc" id="L191">            super(itemView);</span>
+
+<span class="nc" id="L193">            tvUsername = itemView.findViewById(R.id.tv_comment_username);</span>
+<span class="nc" id="L194">            tvContent = itemView.findViewById(R.id.tv_comment_content);</span>
+<span class="nc" id="L195">            tvDate = itemView.findViewById(R.id.tv_comment_date);</span>
+<span class="nc" id="L196">            btnReply = itemView.findViewById(R.id.btn_reply_comment);</span>
+<span class="nc" id="L197">            btnShowReplies = itemView.findViewById(R.id.btn_show_replies);</span>
+
+<span class="nc" id="L199">            replyBoxContainer = itemView.findViewById(R.id.reply_box_container);</span>
+<span class="nc" id="L200">            repliesContainer = itemView.findViewById(R.id.replies_container);</span>
+<span class="nc" id="L201">            repliesInnerContainer = itemView.findViewById(R.id.replies_inner_container);</span>
+
+<span class="nc" id="L203">            etInlineReply = itemView.findViewById(R.id.et_inline_reply);</span>
+<span class="nc" id="L204">            btnCancelInlineReply = itemView.findViewById(R.id.btn_cancel_inline_reply);</span>
+<span class="nc" id="L205">            btnSendInlineReply = itemView.findViewById(R.id.btn_send_inline_reply);</span>
+<span class="nc" id="L206">        }</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span>Generated by the Android Gradle plugin 8.12.2</div></body></html>

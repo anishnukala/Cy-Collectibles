@@ -1,0 +1,268 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > AiController</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">cycollectibles.AIChat</a>
+</div>
+
+<h1>Coverage Summary for Class: AiController (cycollectibles.AIChat)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">AiController</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (3/3)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    11.1%
+  </span>
+  <span class="absValue">
+    (2/18)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    9.4%
+  </span>
+  <span class="absValue">
+    (5/53)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package cycollectibles.AIChat;
+&nbsp;
+&nbsp;import cycollectibles.Favourites.Favourite;
+&nbsp;import cycollectibles.Favourites.FavouriteRepository;
+&nbsp;import cycollectibles.Transaction.Transaction;
+&nbsp;import cycollectibles.Transaction.TransactionRepository;
+&nbsp;import cycollectibles.Users.User;
+&nbsp;import cycollectibles.Users.UserRepository;
+&nbsp;import cycollectibles.helper.Helper;
+&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+&nbsp;import org.springframework.beans.factory.annotation.Value;
+&nbsp;import org.springframework.http.ResponseEntity;
+&nbsp;import org.springframework.web.bind.annotation.*;
+&nbsp;import org.springframework.web.client.RestTemplate;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Map;
+&nbsp;import java.util.Optional;
+&nbsp;import java.util.stream.Collectors;
+&nbsp;
+&nbsp;@RestController
+&nbsp;@RequestMapping(&quot;/ai&quot;)
+<b class="fc">&nbsp;public class AiController {</b>
+&nbsp;
+&nbsp;    @Autowired
+&nbsp;    private AiMessageRepository aiMessageRepository;
+&nbsp;
+&nbsp;    @Autowired
+&nbsp;    private UserRepository userRepository;
+&nbsp;
+&nbsp;    @Autowired
+&nbsp;    private TransactionRepository transactionRepository;
+&nbsp;
+&nbsp;    @Autowired
+&nbsp;    private FavouriteRepository favouriteRepository;
+&nbsp;
+&nbsp;    @Value(&quot;${gemini.api.key}&quot;)
+&nbsp;    private String geminiApiKey;
+&nbsp;
+&nbsp;    @GetMapping(&quot;/chat/{userId}&quot;)
+&nbsp;    ResponseEntity&lt;?&gt; getChatHistory(@PathVariable Integer userId){
+<b class="fc">&nbsp;        Optional&lt;User&gt; userWrapper = userRepository.findById(userId);</b>
+&nbsp;
+<b class="pc">&nbsp;        if(userWrapper.isEmpty()) return ResponseEntity.notFound().build();</b>
+<b class="nc">&nbsp;        User user  = userWrapper.get();</b>
+&nbsp;
+<b class="nc">&nbsp;        List&lt;AiMessage&gt; history = aiMessageRepository.findByUser_IdOrderByCreatedAt(userId);</b>
+<b class="nc">&nbsp;        return ResponseEntity.ok(history);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @PostMapping(&quot;/chat/{userId}&quot;)
+&nbsp;    ResponseEntity&lt;?&gt; sendMessage(@PathVariable Integer userId, @RequestBody Map&lt;String, String&gt; body){
+<b class="fc">&nbsp;        Optional&lt;User&gt; userWrapper = userRepository.findById(userId);</b>
+<b class="pc">&nbsp;        if(userWrapper.isEmpty()) return ResponseEntity.notFound().build();</b>
+<b class="nc">&nbsp;        User user = userWrapper.get();</b>
+&nbsp;
+<b class="nc">&nbsp;        String userMessage = body.get(&quot;message&quot;);</b>
+<b class="nc">&nbsp;        if(userMessage == null || userMessage.isBlank())</b>
+<b class="nc">&nbsp;            return ResponseEntity.badRequest().body(Helper.errorMap(&quot;message&quot;, &quot;Message cannot be empty&quot;));</b>
+&nbsp;
+&nbsp;        // save user message to DB
+<b class="nc">&nbsp;        aiMessageRepository.save(new AiMessage(user, &quot;user&quot;, userMessage));</b>
+&nbsp;
+&nbsp;        // fetch conversation history
+<b class="nc">&nbsp;        List&lt;AiMessage&gt; history = aiMessageRepository.findByUser_IdOrderByCreatedAt(userId);</b>
+&nbsp;
+&nbsp;        // build contents array for Gemini
+<b class="nc">&nbsp;        List&lt;Map&lt;String, Object&gt;&gt; contents = new ArrayList&lt;&gt;();</b>
+&nbsp;
+<b class="nc">&nbsp;        List&lt;Favourite&gt; favourites = favouriteRepository.findByUser_Id(userId);</b>
+&nbsp;        List&lt;Transaction&gt; transactionHist;
+<b class="nc">&nbsp;        if(user.getUserType().equals(&quot;buyer&quot;)){</b>
+<b class="nc">&nbsp;            transactionHist = transactionRepository.findByBuyer_Id(userId);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        else if(user.getUserType().equals(&quot;seller&quot;)){</b>
+<b class="nc">&nbsp;            transactionHist = transactionRepository.findByPosting_Seller_Id(userId);</b>
+&nbsp;        }
+&nbsp;        else{
+<b class="nc">&nbsp;            transactionHist=new ArrayList&lt;&gt;();</b>
+&nbsp;        }
+&nbsp;        // for favourites
+<b class="nc">&nbsp;        String favouriteCategories = favourites.stream()</b>
+<b class="nc">&nbsp;                .map(Favourite::getCategory)</b>
+<b class="nc">&nbsp;                .collect(Collectors.joining(&quot;, &quot;));</b>
+&nbsp;
+&nbsp;// for transactions
+<b class="nc">&nbsp;        String transactionSummary = transactionHist.stream()</b>
+<b class="nc">&nbsp;                .map(t -&gt; t.getPosting().getTitle())</b>
+<b class="nc">&nbsp;                .collect(Collectors.joining(&quot;, &quot;));</b>
+&nbsp;
+&nbsp;        // system prompt first
+<b class="nc">&nbsp;        contents.add(Map.of(</b>
+&nbsp;                &quot;role&quot;, &quot;user&quot;,
+<b class="nc">&nbsp;                &quot;parts&quot;, List.of(Map.of(&quot;text&quot;, &quot;You are CyBot, a helpful assistant for CyCollectibles — a marketplace for buying and selling collectibles including Comics, Cards, Electronics, Figures, Antiques, Furniture, Video Games, and more. &quot; +</b>
+&nbsp;                        &quot;Here is how the platform works: &quot; +
+&nbsp;                        &quot;Sellers can create listings with a title, description, price, genre, and image. Buyers can browse listings, filter by genre, price, and title, add items to their cart, and purchase them. &quot; +
+&nbsp;                        &quot;Users can report listings they find suspicious, and admins will review and verify or ban them. &quot; +
+&nbsp;                        &quot;Users can message each other through direct messages or group chats. &quot; +
+&nbsp;                        &quot;Users can leave comments on listings. &quot; +
+&nbsp;                        &quot;Buyers can save their favourite categories and get notified when new listings are posted in those categories. &quot; +
+&nbsp;                        &quot;Users get notifications for purchases, messages, flags, bans, and listing updates. &quot; +
+&nbsp;                        &quot;Admins can ban users, ban listings, flag users, and verify reported listings. &quot; +
+&nbsp;                        &quot;Here is some context about the user you are talking to: &quot; +
+<b class="nc">&nbsp;                        &quot;Username: &quot; + user.getUsername() + &quot;. &quot; +</b>
+<b class="nc">&nbsp;                        &quot;User type: &quot; + user.getUserType() + &quot;. &quot; +</b>
+<b class="nc">&nbsp;                        &quot;Favourite categories: &quot; + (favouriteCategories.isEmpty() ? &quot;none set&quot; : favouriteCategories) + &quot;. &quot; +</b>
+<b class="nc">&nbsp;                        &quot;Transaction history: &quot; + (transactionSummary.isEmpty() ? &quot;no transactions yet&quot; : transactionSummary) + &quot;. &quot; +</b>
+&nbsp;                        &quot;Use this context to give personalized recommendations and advice. &quot; +
+&nbsp;                        &quot;You can help with: finding collectibles, pricing advice, selling tips, platform features, and anything related to collectibles as a hobby or investment. &quot; +
+&nbsp;                        &quot;If the user asks about something completely unrelated to collectibles or the platform, politely redirect them by saying: &quot; +
+&nbsp;                        &quot;&#39;I&#39;m CyBot, I&#39;m here to help with all things collectibles and CyCollectibles! Is there anything I can help you with on the platform?&#39;&quot;))
+&nbsp;        ));
+&nbsp;        //add info about , user, traction history, prefrences
+<b class="nc">&nbsp;        contents.add(Map.of(</b>
+&nbsp;                &quot;role&quot;, &quot;model&quot;,
+<b class="nc">&nbsp;                &quot;parts&quot;, List.of(Map.of(&quot;text&quot;, &quot;Understood, I will only help with CyCollectibles related questions.&quot;))</b>
+&nbsp;        ));
+&nbsp;
+&nbsp;        // add conversation history
+<b class="nc">&nbsp;        for(AiMessage msg : history){</b>
+<b class="nc">&nbsp;            contents.add(Map.of(</b>
+<b class="nc">&nbsp;                    &quot;role&quot;, msg.getRole(),</b>
+<b class="nc">&nbsp;                    &quot;parts&quot;, List.of(Map.of(&quot;text&quot;, msg.getContent()))</b>
+&nbsp;            ));
+&nbsp;        }
+&nbsp;
+&nbsp;        // call Gemini
+&nbsp;        try {
+<b class="nc">&nbsp;            RestTemplate restTemplate = new RestTemplate();</b>
+<b class="nc">&nbsp;            String url = &quot;https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=&quot; + geminiApiKey;</b>
+<b class="nc">&nbsp;            Map&lt;String, Object&gt; requestBody = Map.of(&quot;contents&quot;, contents);</b>
+<b class="nc">&nbsp;            Map response = restTemplate.postForObject(url, requestBody, Map.class);</b>
+&nbsp;
+&nbsp;            // extract response text
+<b class="nc">&nbsp;            List candidates = (List) response.get(&quot;candidates&quot;);</b>
+<b class="nc">&nbsp;            Map candidate = (Map) candidates.get(0);</b>
+<b class="nc">&nbsp;            Map content = (Map) candidate.get(&quot;content&quot;);</b>
+<b class="nc">&nbsp;            List parts = (List) content.get(&quot;parts&quot;);</b>
+<b class="nc">&nbsp;            Map part = (Map) parts.get(0);</b>
+<b class="nc">&nbsp;            String aiResponse = (String) part.get(&quot;text&quot;);</b>
+&nbsp;
+&nbsp;            // save AI response to DB
+<b class="nc">&nbsp;            aiMessageRepository.save(new AiMessage(user, &quot;model&quot;, aiResponse));</b>
+&nbsp;
+<b class="nc">&nbsp;            return ResponseEntity.ok(Map.of(&quot;response&quot;, aiResponse));</b>
+&nbsp;        } catch (Exception e) {
+<b class="nc">&nbsp;            e.printStackTrace();</b>
+<b class="nc">&nbsp;            return ResponseEntity.status(500).body(Helper.errorMap(&quot;message&quot;, &quot;AI service error&quot;));</b>
+&nbsp;        }
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-05-05 13:27</div>
+</div>
+</body>
+</html>

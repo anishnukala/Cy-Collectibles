@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ChatListAdapter.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=0;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">debug</a> &gt; <a href="index.source.html" class="el_package">com.example.androidexample</a> &gt; <span class="el_source">ChatListAdapter.java</span></div><h1>ChatListAdapter.java</h1><pre class="source lang-java linenums">package com.example.androidexample;
+
+import android.content.Context;
+import android.content.Intent;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.RecyclerView;
+
+import java.util.List;
+
+public class ChatListAdapter extends RecyclerView.Adapter&lt;ChatListAdapter.ChatViewHolder&gt; {
+
+    private final Context context;
+    private final List&lt;ChatItem&gt; items;
+    private final long userId;
+    private final String username;
+    private final String userType;
+
+<span class="fc" id="L24">    public ChatListAdapter(Context context, List&lt;ChatItem&gt; items, long userId, String username, String userType) {</span>
+<span class="fc" id="L25">        this.context = context;</span>
+<span class="fc" id="L26">        this.items = items;</span>
+<span class="fc" id="L27">        this.userId = userId;</span>
+<span class="fc" id="L28">        this.username = username;</span>
+<span class="fc" id="L29">        this.userType = userType;</span>
+<span class="fc" id="L30">    }</span>
+
+    @NonNull
+    @Override
+    public ChatViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+<span class="nc" id="L35">        View view = LayoutInflater.from(context).inflate(R.layout.item_chat, parent, false);</span>
+<span class="nc" id="L36">        return new ChatViewHolder(view);</span>
+    }
+
+    @Override
+    public void onBindViewHolder(@NonNull ChatViewHolder holder, int position) {
+<span class="nc" id="L41">        ChatItem item = items.get(position);</span>
+
+<span class="nc" id="L43">        holder.nameText.setText(item.getName());</span>
+
+<span class="nc" id="L45">        String lastMessage = item.getLastMessage();</span>
+<span class="nc" id="L46">        holder.messageText.setText(</span>
+<span class="nc bnc" id="L47" title="All 4 branches missed.">                lastMessage == null || lastMessage.trim().isEmpty()</span>
+<span class="nc" id="L48">                        ? &quot;No messages yet&quot;</span>
+<span class="nc" id="L49">                        : lastMessage</span>
+        );
+
+<span class="nc" id="L52">        String time = item.getLastMessageDate();</span>
+<span class="nc" id="L53">        holder.timeText.setText(</span>
+<span class="nc bnc" id="L54" title="All 6 branches missed.">                time == null || time.trim().isEmpty() || &quot;null&quot;.equalsIgnoreCase(time)</span>
+<span class="nc" id="L55">                        ? &quot;&quot;</span>
+<span class="nc" id="L56">                        : time</span>
+        );
+
+<span class="nc" id="L59">        boolean isGroup = &quot;GROUP&quot;.equalsIgnoreCase(item.getType());</span>
+
+<span class="nc bnc" id="L61" title="All 2 branches missed.">        if (isGroup) {</span>
+<span class="nc" id="L62">            holder.avatarImage.setImageResource(R.drawable.group);</span>
+        } else {
+<span class="nc" id="L64">            holder.avatarImage.setImageResource(R.drawable.direct);</span>
+        }
+
+<span class="nc" id="L67">        String members = item.getMemberSummary();</span>
+<span class="nc bnc" id="L68" title="All 6 branches missed.">        if (isGroup &amp;&amp; members != null &amp;&amp; !members.trim().isEmpty()) {</span>
+<span class="nc" id="L69">            holder.membersText.setVisibility(View.VISIBLE);</span>
+<span class="nc" id="L70">            holder.membersText.setText(members);</span>
+        } else {
+<span class="nc" id="L72">            holder.membersText.setVisibility(View.GONE);</span>
+        }
+
+<span class="nc bnc" id="L75" title="All 2 branches missed.">        holder.unreadDot.setVisibility(item.isUnread() ? View.VISIBLE : View.INVISIBLE);</span>
+
+<span class="nc" id="L77">        holder.itemView.setOnClickListener(v -&gt; {</span>
+<span class="nc" id="L78">            Intent intent = new Intent(context, ChatScreenActivity.class);</span>
+<span class="nc" id="L79">            intent.putExtra(&quot;CHANNEL_ID&quot;, item.getChannelId());</span>
+<span class="nc" id="L80">            intent.putExtra(&quot;CHAT_NAME&quot;, item.getName());</span>
+<span class="nc" id="L81">            intent.putExtra(&quot;USER_ID&quot;, userId);</span>
+<span class="nc" id="L82">            intent.putExtra(&quot;USERNAME&quot;, username);</span>
+<span class="nc" id="L83">            intent.putExtra(&quot;USERTYPE&quot;, userType);</span>
+<span class="nc" id="L84">            context.startActivity(intent);</span>
+<span class="nc" id="L85">        });</span>
+<span class="nc" id="L86">    }</span>
+
+    @Override
+    public int getItemCount() {
+<span class="pc bpc" id="L90" title="1 of 2 branches missed.">        return items == null ? 0 : items.size();</span>
+    }
+
+    static class ChatViewHolder extends RecyclerView.ViewHolder {
+        ImageView avatarImage;
+        TextView nameText;
+        TextView membersText;
+        TextView messageText;
+        TextView timeText;
+        View unreadDot;
+
+        public ChatViewHolder(@NonNull View itemView) {
+<span class="nc" id="L102">            super(itemView);</span>
+<span class="nc" id="L103">            avatarImage = itemView.findViewById(R.id.img_chat_avatar);</span>
+<span class="nc" id="L104">            nameText = itemView.findViewById(R.id.txt_chat_name);</span>
+<span class="nc" id="L105">            membersText = itemView.findViewById(R.id.txt_chat_members);</span>
+<span class="nc" id="L106">            messageText = itemView.findViewById(R.id.txt_last_message);</span>
+<span class="nc" id="L107">            timeText = itemView.findViewById(R.id.txt_last_message_time);</span>
+<span class="nc" id="L108">            unreadDot = itemView.findViewById(R.id.view_unread_dot);</span>
+<span class="nc" id="L109">        }</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span>Generated by the Android Gradle plugin 8.12.2</div></body></html>

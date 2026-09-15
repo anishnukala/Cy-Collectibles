@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#FFFFFF">
+
+    <!-- TOP BAR -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:background="#BB0202"
+        android:gravity="center_vertical"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp">
+
+        <TextView
+            android:id="@+id/btn_close"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="X"
+            android:textColor="#FFFFFF"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true" />
+
+    </RelativeLayout>
+
+    <!-- CONTENT -->
+    <FrameLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1">
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:fillViewport="true">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <!-- TITLE -->
+                <TextView
+                    android:id="@+id/txt_chat_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Chats"
+                    android:textColor="#555555"
+                    android:textSize="34sp"
+                    android:textStyle="bold" />
+
+                <!-- SUBTITLE -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Manage your conversations"
+                    android:textColor="#555555"
+                    android:textSize="20sp"
+                    android:textStyle="bold"
+                    android:layout_marginTop="6dp"
+                    android:layout_marginBottom="16dp" />
+
+                <!-- SEARCH -->
+                <EditText
+                    android:id="@+id/edt_search_chats"
+                    android:layout_width="match_parent"
+                    android:layout_height="52dp"
+                    android:layout_marginBottom="16dp"
+                    android:background="@drawable/bg_input"
+                    android:hint="Search chats"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:textColor="#444444"
+                    android:textColorHint="#888888" />
+
+                <!-- FILTER BUTTONS -->
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:layout_marginBottom="16dp">
+
+                    <TextView
+                        android:id="@+id/chip_all"
+                        android:layout_width="wrap_content"
+                        android:layout_height="44dp"
+                        android:background="@drawable/bg_chip_selected"
+                        android:gravity="center"
+                        android:paddingStart="22dp"
+                        android:paddingEnd="22dp"
+                        android:text="All"
+                        android:textColor="#FFFFFF"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/chip_direct"
+                        android:layout_width="wrap_content"
+                        android:layout_height="44dp"
+                        android:layout_marginStart="10dp"
+                        android:background="@drawable/bg_chip_unselected"
+                        android:gravity="center"
+                        android:paddingStart="22dp"
+                        android:paddingEnd="22dp"
+                        android:text="Direct"
+                        android:textColor="#555555"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:id="@+id/chip_groups"
+                        android:layout_width="wrap_content"
+                        android:layout_height="44dp"
+                        android:layout_marginStart="10dp"
+                        android:background="@drawable/bg_chip_unselected"
+                        android:gravity="center"
+                        android:paddingStart="22dp"
+                        android:paddingEnd="22dp"
+                        android:text="Groups"
+                        android:textColor="#555555"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <!-- CHAT LIST -->
+                <FrameLayout
+                    android:id="@+id/chat_list_container"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:minHeight="400dp" />
+
+            </LinearLayout>
+        </ScrollView>
+
+        <!-- FLOATING + BUTTON -->
+        <TextView
+            android:id="@+id/btn_new_chat_fab"
+            android:layout_width="56dp"
+            android:layout_height="56dp"
+            android:layout_gravity="bottom|end"
+            android:layout_marginEnd="20dp"
+            android:layout_marginBottom="20dp"
+            android:background="@drawable/bg_fab_red"
+            android:gravity="center"
+            android:text="+"
+            android:textColor="#FFFFFF"
+            android:textSize="28sp"
+            android:textStyle="bold" />
+
+    </FrameLayout>
+
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottom_nav"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="#D9D9D9"
+        app:itemActiveIndicatorStyle="@null"
+        app:itemIconTint="@drawable/nav_item_color"
+        app:itemTextColor="@drawable/nav_item_color"
+        app:labelVisibilityMode="labeled"
+        app:menu="@menu/seller_bottom_menu" />
+
+</LinearLayout>

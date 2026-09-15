@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat
+    xmlns:tools="http://schemas.android.com/tools"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    tools:context=".MainActivity"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent"
+    android:background="#F1BE48"
+    android:orientation="vertical">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="SIGNUP"
+        android:layout_gravity="center"
+        android:layout_marginTop="100dp"
+        android:layout_marginBottom="50dp"
+        android:textSize="50dp"
+        android:textColor="#C8102E">
+    </TextView>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginBottom="30dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="username: "
+            android:textSize="20dp"
+            android:textColor="#000000">
+        </TextView>
+
+        <EditText
+            android:id="@+id/signup_username_edt"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:hint="Enter Username Here">
+        </EditText>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="password: "
+            android:textSize="20dp"
+            android:textColor="#000000">
+        </TextView>
+
+        <EditText
+            android:id="@+id/signup_password_edt"
+            android:layout_width="wrap_content"
+            android:inputType="textPassword"
+            android:layout_height="50dp"
+            android:hint="Enter Password Here">
+        </EditText>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="70sp"
+            android:text="confirm\npassword: "
+            android:textColor="#000000"
+            android:textSize="20dp"></TextView>
+
+        <EditText
+            android:id="@+id/signup_confirm_edt"
+            android:layout_width="wrap_content"
+            android:inputType="textPassword"
+            android:layout_height="70dp"
+            android:hint="Enter Password Here">
+        </EditText>
+
+    </LinearLayout>
+
+    <Button
+        android:id="@+id/signup_signup_btn"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="40dp"
+        android:text="Signup"
+        android:textSize="20sp"
+        android:layout_gravity="center"
+        android:backgroundTint="#C8102E"
+        android:textColor="#ffffff">
+    </Button>
+
+    <TextView
+        android:id="@+id/login_label"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Have an account? Login to your account"
+        android:textColor="#C8102E"
+        android:layout_marginTop="20dp"
+        android:layout_gravity="center" />
+
+
+    <Button
+        android:id="@+id/signup_login_btn"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:text="Login"
+        android:textSize="20sp"
+        android:layout_gravity="center"
+        android:backgroundTint="#C8102E"
+        android:textColor="#ffffff">
+    </Button>
+
+
+
+</androidx.appcompat.widget.LinearLayoutCompat>

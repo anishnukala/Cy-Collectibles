@@ -1,0 +1,1 @@
+typeSearchIndex = [{"p":"com.example.androidexample","l":"AdminHomeActivity"},{"l":"All Classes and Interfaces","u":"allclasses-index.html"},{"p":"com.example.androidexample","l":"AllUsersActivity"},{"p":"com.example.androidexample","l":"BuyerTransactionsActivity"}];updateSearchResults();

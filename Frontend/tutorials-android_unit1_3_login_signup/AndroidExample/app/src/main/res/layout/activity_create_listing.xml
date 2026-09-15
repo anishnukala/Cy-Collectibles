@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/create_listing_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#FFFFFF">
+
+    <!-- Top bar -->
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:background="#B30000"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:gravity="center_vertical">
+
+        <TextView
+            android:id="@+id/btn_close"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="X"
+            android:textColor="#FFFFFF"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true" />
+
+    </RelativeLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="20dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Listing Details"
+                android:textSize="34sp"
+                android:textStyle="bold"
+                android:textColor="#555555"
+                android:layout_marginBottom="16dp" />
+
+            <!-- Image picker card -->
+            <LinearLayout
+                android:id="@+id/card_add_image"
+                android:layout_width="match_parent"
+                android:layout_height="140dp"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:background="@drawable/bg_card"
+                android:padding="16dp">
+
+                <ImageView
+                    android:id="@+id/iv_listing_preview"
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:src="@android:drawable/ic_menu_camera"
+                    android:contentDescription="Add image" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Add images"
+                    android:textSize="18sp"
+                    android:textColor="#666666"
+                    android:layout_marginTop="10dp" />
+            </LinearLayout>
+
+            <!-- Title -->
+            <EditText
+                android:id="@+id/edt_title"
+                android:layout_width="match_parent"
+                android:layout_height="54dp"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/bg_input"
+                android:hint="Title"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:textSize="18sp"
+                android:inputType="text" />
+
+            <!-- Price -->
+            <EditText
+                android:id="@+id/edt_price"
+                android:layout_width="match_parent"
+                android:layout_height="54dp"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/bg_input"
+                android:hint="Price"
+                android:paddingStart="16dp"
+                android:paddingEnd="16dp"
+                android:textSize="18sp"
+                android:inputType="number" />
+
+            <!-- Genre (Category dropdown) -->
+            <Spinner
+                android:id="@+id/spn_genre"
+                android:layout_width="match_parent"
+                android:layout_height="54dp"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/bg_input"
+                android:paddingStart="12dp"
+                android:paddingEnd="12dp" />
+
+            <!-- Description -->
+            <EditText
+                android:id="@+id/edt_description"
+                android:layout_width="match_parent"
+                android:layout_height="160dp"
+                android:layout_marginTop="12dp"
+                android:background="@drawable/bg_input"
+                android:hint="Description"
+                android:padding="16dp"
+                android:textSize="18sp"
+                android:gravity="top"
+                android:inputType="textMultiLine"
+                android:minLines="5" />
+
+            <!-- Create button -->
+            <Button
+                android:id="@+id/btn_create_listing"
+                android:layout_width="match_parent"
+                android:layout_height="56dp"
+                android:layout_marginTop="18dp"
+                android:text="+ Create Listing"
+                android:textAllCaps="false"
+                android:textSize="20sp"
+                android:textColor="#FFFFFF"
+                android:background="@drawable/bg_red_rounded"
+                android:backgroundTint="@null"
+                app:backgroundTint="@null" />
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="16dp"
+                android:text="" />
+        </LinearLayout>
+    </ScrollView>
+
+</LinearLayout>

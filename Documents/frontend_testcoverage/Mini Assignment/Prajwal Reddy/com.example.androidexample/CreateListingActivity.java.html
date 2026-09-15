@@ -1,0 +1,277 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CreateListingActivity.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=0;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">debug</a> &gt; <a href="index.source.html" class="el_package">com.example.androidexample</a> &gt; <span class="el_source">CreateListingActivity.java</span></div><h1>CreateListingActivity.java</h1><pre class="source lang-java linenums">package com.example.androidexample;
+
+import android.content.ContentResolver;
+import android.content.SharedPreferences;
+import android.database.Cursor;
+import android.net.Uri;
+import android.os.Bundle;
+import android.provider.OpenableColumns;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.Spinner;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONObject;
+
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+
+<span class="nc" id="L29">public class CreateListingActivity extends AppCompatActivity {</span>
+    private LinearLayout cardAddImage;
+    private ImageView ivPreview;
+    private EditText edtTitle, edtPrice, edtDescription;
+    private Spinner spnGenre;
+    private Button btnCreate;
+    private TextView btnClose;
+
+    // Stores the image chosen by the user
+<span class="nc" id="L38">    private Uri selectedImageUri = null;</span>
+
+    // Logged-in user id used as sellerId when creating a posting
+<span class="nc" id="L41">    private long sellerId = -1;</span>
+
+    // Launcher used to open the gallery/file
+<span class="nc" id="L44">    private final ActivityResultLauncher&lt;String&gt; pickImageLauncher =</span>
+<span class="nc" id="L45">            registerForActivityResult(new ActivityResultContracts.GetContent(), uri -&gt; {</span>
+<span class="nc bnc" id="L46" title="All 2 branches missed.">                if (uri != null) {</span>
+                    // Save selected image URI
+<span class="nc" id="L48">                    selectedImageUri = uri;</span>
+
+                    // Show selected image in preview
+<span class="nc" id="L51">                    ivPreview.setImageURI(uri);</span>
+                }
+<span class="nc" id="L53">            });</span>
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+<span class="nc" id="L57">        super.onCreate(savedInstanceState);</span>
+<span class="nc" id="L58">        setContentView(R.layout.activity_create_listing);</span>
+
+        // Link Java variables to XML views
+<span class="nc" id="L61">        cardAddImage = findViewById(R.id.card_add_image);</span>
+<span class="nc" id="L62">        ivPreview = findViewById(R.id.iv_listing_preview);</span>
+<span class="nc" id="L63">        edtTitle = findViewById(R.id.edt_title);</span>
+<span class="nc" id="L64">        edtPrice = findViewById(R.id.edt_price);</span>
+<span class="nc" id="L65">        edtDescription = findViewById(R.id.edt_description);</span>
+<span class="nc" id="L66">        spnGenre = findViewById(R.id.spn_genre);</span>
+<span class="nc" id="L67">        btnCreate = findViewById(R.id.btn_create_listing);</span>
+<span class="nc" id="L68">        btnClose = findViewById(R.id.btn_close);</span>
+
+        // Read saved user id from SharedPreferences
+<span class="nc" id="L71">        SharedPreferences prefs = getSharedPreferences(&quot;AUTH&quot;, MODE_PRIVATE);</span>
+<span class="nc" id="L72">        sellerId = prefs.getLong(&quot;USER_ID&quot;, -1);</span>
+
+        // If no user id is found, user must log in again
+<span class="nc bnc" id="L75" title="All 2 branches missed.">        if (sellerId == -1) {</span>
+<span class="nc" id="L76">            Toast.makeText(this, &quot;No user id saved. Please login again.&quot;, Toast.LENGTH_LONG).show();</span>
+<span class="nc" id="L77">            finish();</span>
+<span class="nc" id="L78">            return;</span>
+        }
+
+        // Genre options for the spinner dropdown
+<span class="nc" id="L82">        String[] genres = {</span>
+                &quot;Comics&quot;,
+                &quot;Cards&quot;,
+                &quot;Electronics&quot;,
+                &quot;Video Games&quot;,
+                &quot;Figures&quot;,
+                &quot;Antique&quot;,
+                &quot;Furniture&quot;,
+                &quot;Other&quot;
+        };
+
+        // Adapter connects the genre array to the spinner
+<span class="nc" id="L94">        ArrayAdapter&lt;String&gt; adapter = new ArrayAdapter&lt;&gt;(</span>
+                this,
+                android.R.layout.simple_spinner_item,
+                genres
+        );
+<span class="nc" id="L99">        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);</span>
+<span class="nc" id="L100">        spnGenre.setAdapter(adapter);</span>
+
+<span class="nc" id="L102">        btnClose.setOnClickListener(v -&gt; finish());</span>
+
+        // When image card is clicked, open image picker
+<span class="nc" id="L105">        cardAddImage.setOnClickListener(v -&gt; pickImageLauncher.launch(&quot;image/*&quot;));</span>
+
+        // When create button is clicked, send form data to backend
+<span class="nc" id="L108">        btnCreate.setOnClickListener(v -&gt; submitPosting());</span>
+<span class="nc" id="L109">    }</span>
+
+    private void submitPosting() {
+        // Read input values from form fields
+<span class="nc" id="L113">        String title = edtTitle.getText().toString().trim();</span>
+<span class="nc" id="L114">        String description = edtDescription.getText().toString().trim();</span>
+<span class="nc" id="L115">        String priceStr = edtPrice.getText().toString().trim();</span>
+<span class="nc" id="L116">        String genre = (String) spnGenre.getSelectedItem();</span>
+
+        // user must choose an image
+<span class="nc bnc" id="L119" title="All 2 branches missed.">        if (selectedImageUri == null) {</span>
+<span class="nc" id="L120">            Toast.makeText(this, &quot;Please insert a picture&quot;, Toast.LENGTH_SHORT).show();</span>
+<span class="nc" id="L121">            return;</span>
+        }
+
+        // all text fields must be filled
+<span class="nc bnc" id="L125" title="All 10 branches missed.">        if (title.isEmpty() || description.isEmpty() || priceStr.isEmpty() || genre == null || genre.isEmpty()) {</span>
+<span class="nc" id="L126">            Toast.makeText(this, &quot;Fill all fields&quot;, Toast.LENGTH_SHORT).show();</span>
+<span class="nc" id="L127">            return;</span>
+        }
+
+        //price must be a integer
+        int price;
+        try {
+<span class="nc" id="L133">            price = Integer.parseInt(priceStr);</span>
+<span class="nc bnc" id="L134" title="All 2 branches missed.">            if (price &lt;= 0) {</span>
+<span class="nc" id="L135">                Toast.makeText(this, &quot;Price must be greater than 0&quot;, Toast.LENGTH_SHORT).show();</span>
+<span class="nc" id="L136">                return;</span>
+            }
+<span class="nc" id="L138">        } catch (Exception e) {</span>
+<span class="nc" id="L139">            Toast.makeText(this, &quot;Price must be a number&quot;, Toast.LENGTH_SHORT).show();</span>
+<span class="nc" id="L140">            return;</span>
+<span class="nc" id="L141">        }</span>
+
+        // Build JSON object for the non-file posting data
+<span class="nc" id="L144">        JSONObject dataJson = new JSONObject();</span>
+        try {
+<span class="nc" id="L146">            dataJson.put(&quot;sellerId&quot;, (int) sellerId);   // backend expects Integer</span>
+<span class="nc" id="L147">            dataJson.put(&quot;title&quot;, title);</span>
+<span class="nc" id="L148">            dataJson.put(&quot;description&quot;, description);</span>
+<span class="nc" id="L149">            dataJson.put(&quot;price&quot;, price);</span>
+<span class="nc" id="L150">            dataJson.put(&quot;genre&quot;, genre);</span>
+<span class="nc" id="L151">        } catch (Exception e) {</span>
+<span class="nc" id="L152">            Toast.makeText(this, &quot;JSON error&quot;, Toast.LENGTH_SHORT).show();</span>
+<span class="nc" id="L153">            return;</span>
+<span class="nc" id="L154">        }</span>
+
+        // Variables for image upload
+        byte[] imageBytes;
+        String imageFileName;
+        String imageMime;
+
+        try {
+<span class="nc" id="L162">            ContentResolver cr = getContentResolver();</span>
+
+<span class="nc" id="L164">            imageMime = cr.getType(selectedImageUri);</span>
+
+            // Make sure selected file is actually an image
+<span class="nc bnc" id="L167" title="All 4 branches missed.">            if (imageMime == null || !imageMime.startsWith(&quot;image/&quot;)) {</span>
+<span class="nc" id="L168">                Toast.makeText(this, &quot;Only image files allowed&quot;, Toast.LENGTH_SHORT).show();</span>
+<span class="nc" id="L169">                return;</span>
+            }
+
+            // Get original file name if possible
+<span class="nc" id="L173">            imageFileName = getFileName(selectedImageUri);</span>
+<span class="nc bnc" id="L174" title="All 2 branches missed.">            if (imageFileName == null) imageFileName = &quot;image.jpg&quot;;</span>
+
+            // Read image file into byte array for multipart upload
+<span class="nc" id="L177">            imageBytes = readAllBytes(selectedImageUri);</span>
+<span class="nc" id="L178">        } catch (Exception e) {</span>
+<span class="nc" id="L179">            Toast.makeText(this, &quot;Failed to read image&quot;, Toast.LENGTH_LONG).show();</span>
+<span class="nc" id="L180">            return;</span>
+<span class="nc" id="L181">        }</span>
+
+        // Disable button so user doesn't submit multiple times
+<span class="nc" id="L184">        btnCreate.setEnabled(false);</span>
+
+        // API endpoint for creating postings
+<span class="nc" id="L187">        String url = BuildConfig.BASE_URL + &quot;/postings&quot;;</span>
+
+        // Create multipart request with success and error handlers
+<span class="nc" id="L190">        MultipartRequest req = new MultipartRequest(</span>
+                url,
+                response -&gt; {
+                    // Re-enable button after success
+<span class="nc" id="L194">                    btnCreate.setEnabled(true);</span>
+
+                    // Backend returns 201 Created with empty response body
+<span class="nc" id="L197">                    Toast.makeText(this, &quot;Listing created&quot;, Toast.LENGTH_SHORT).show();</span>
+<span class="nc" id="L198">                    finish();</span>
+<span class="nc" id="L199">                },</span>
+                error -&gt; {
+                    // Re-enable button after failure
+<span class="nc" id="L202">                    btnCreate.setEnabled(true);</span>
+
+                    // Get HTTP status code if available
+<span class="nc bnc" id="L205" title="All 2 branches missed.">                    int status = (error.networkResponse != null) ? error.networkResponse.statusCode : -1;</span>
+
+                    // Try reading backend message
+<span class="nc" id="L208">                    String serverMsg = MultipartRequest.tryExtractServerMessage(error);</span>
+
+<span class="nc bnc" id="L210" title="All 2 branches missed.">                    if (status == 400) {</span>
+<span class="nc bnc" id="L211" title="All 2 branches missed.">                        Toast.makeText(this, (serverMsg != null) ? serverMsg : &quot;Invalid input&quot;, Toast.LENGTH_LONG).show();</span>
+<span class="nc bnc" id="L212" title="All 2 branches missed.">                    } else if (status == 404) {</span>
+<span class="nc" id="L213">                        Toast.makeText(this, &quot;Seller not found (404)&quot;, Toast.LENGTH_LONG).show();</span>
+<span class="nc bnc" id="L214" title="All 2 branches missed.">                    } else if (status == -1) {</span>
+<span class="nc bnc" id="L215" title="All 2 branches missed.">                        String msg = (error.getMessage() != null) ? error.getMessage() : &quot;Network error&quot;;</span>
+<span class="nc" id="L216">                        Toast.makeText(this, &quot;Create failed: &quot; + msg, Toast.LENGTH_LONG).show();</span>
+<span class="nc" id="L217">                    } else {</span>
+<span class="nc" id="L218">                        Toast.makeText(</span>
+                                this,
+<span class="nc bnc" id="L220" title="All 2 branches missed.">                                &quot;Create failed (&quot; + status + &quot;)&quot; + (serverMsg != null ? (&quot;: &quot; + serverMsg) : &quot;&quot;),</span>
+                                Toast.LENGTH_LONG
+<span class="nc" id="L222">                        ).show();</span>
+                    }
+<span class="nc" id="L224">                }</span>
+        );
+
+        // Add JSON part named &quot;data&quot;
+<span class="nc" id="L228">        req.addFormField(&quot;data&quot;, dataJson.toString(), &quot;application/json; charset=utf-8&quot;);</span>
+
+        // Add image file part named &quot;image&quot;
+<span class="nc" id="L231">        req.addFilePart(&quot;image&quot;, imageFileName, imageMime, imageBytes);</span>
+
+        // Send request using Volley
+<span class="nc" id="L234">        Volley.newRequestQueue(this).add(req);</span>
+<span class="nc" id="L235">    }</span>
+
+    private byte[] readAllBytes(Uri uri) throws Exception {
+        // Opens the selected file and converts it into a byte array
+<span class="nc" id="L239">        try (InputStream in = getContentResolver().openInputStream(uri);</span>
+<span class="nc" id="L240">             ByteArrayOutputStream out = new ByteArrayOutputStream()) {</span>
+
+<span class="nc bnc" id="L242" title="All 2 branches missed.">            if (in == null) throw new IllegalStateException(&quot;InputStream null&quot;);</span>
+
+<span class="nc" id="L244">            byte[] buf = new byte[8192];</span>
+            int n;
+
+            // Read file in chunks
+<span class="nc bnc" id="L248" title="All 2 branches missed.">            while ((n = in.read(buf)) &gt; 0) {</span>
+<span class="nc" id="L249">                out.write(buf, 0, n);</span>
+            }
+
+<span class="nc" id="L252">            return out.toByteArray();</span>
+        }
+    }
+
+    private String getFileName(Uri uri) {
+        // Try to get display name of the selected file from content resolver
+<span class="nc" id="L258">        String result = null;</span>
+
+<span class="nc bnc" id="L260" title="All 2 branches missed.">        if (&quot;content&quot;.equals(uri.getScheme())) {</span>
+<span class="nc" id="L261">            Cursor cursor = getContentResolver().query(uri, null, null, null, null);</span>
+            try {
+<span class="nc bnc" id="L263" title="All 4 branches missed.">                if (cursor != null &amp;&amp; cursor.moveToFirst()) {</span>
+<span class="nc" id="L264">                    int idx = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);</span>
+<span class="nc bnc" id="L265" title="All 2 branches missed.">                    if (idx &gt;= 0) {</span>
+<span class="nc" id="L266">                        result = cursor.getString(idx);</span>
+                    }
+                }
+            } finally {
+<span class="nc bnc" id="L270" title="All 2 branches missed.">                if (cursor != null) cursor.close();</span>
+            }
+        }
+
+<span class="nc" id="L274">        return result;</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span>Generated by the Android Gradle plugin 8.12.2</div></body></html>

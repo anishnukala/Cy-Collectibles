@@ -1,0 +1,208 @@
+
+
+
+<!DOCTYPE html>
+<html id="htmlId">
+<head>
+  <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"> 
+  <title>Coverage Report > CartController</title>
+  <style type="text/css">
+    @import "../../css/coverage.css";
+    @import "../../css/idea.min.css";
+  </style>
+  <script type="text/javascript" src="../../js/highlight.min.js"></script>
+  <script type="text/javascript" src="../../js/highlightjs-line-numbers.min.js"></script>
+</head>
+
+<body>
+<div class="content">
+<div class="breadCrumbs">
+Current scope:     <a href="../../index.html">all classes</a>
+    <span class="separator">|</span>
+    <a href="../index.html">cycollectibles.Cart</a>
+</div>
+
+<h1>Coverage Summary for Class: CartController (cycollectibles.Cart)</h1>
+
+<table class="coverageStats">
+<tr>
+  <th class="name">Class</th>
+<th class="coverageStat 
+">
+  Class, %
+</th>
+<th class="coverageStat 
+">
+  Method, %
+</th>
+<th class="coverageStat 
+">
+  Branch, %
+</th>
+<th class="coverageStat 
+">
+  Line, %
+</th>
+</tr>
+<tr>
+  <td class="name">CartController</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (1/1)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    100%
+  </span>
+  <span class="absValue">
+    (5/5)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    16.7%
+  </span>
+  <span class="absValue">
+    (4/24)
+  </span>
+</td>
+<td class="coverageStat">
+  <span class="percent">
+    23.8%
+  </span>
+  <span class="absValue">
+    (10/42)
+  </span>
+</td>
+</tr>
+
+</table>
+
+<br/>
+<br/>
+
+
+<pre>
+<code class="sourceCode" id="sourceCode">&nbsp;package cycollectibles.Cart;
+&nbsp;
+&nbsp;import cycollectibles.Postings.Posting;
+&nbsp;import cycollectibles.Postings.PostingRepository;
+&nbsp;import cycollectibles.Postings.PostingResponse;
+&nbsp;import cycollectibles.Users.User;
+&nbsp;import cycollectibles.Users.UserRepository;
+&nbsp;import org.springframework.beans.factory.annotation.Autowired;
+&nbsp;import org.springframework.http.ResponseEntity;
+&nbsp;import org.springframework.web.bind.annotation.*;
+&nbsp;
+&nbsp;import java.util.ArrayList;
+&nbsp;import java.util.List;
+&nbsp;import java.util.Optional;
+&nbsp;
+&nbsp;@RestController
+&nbsp;@RequestMapping(&quot;/cart&quot;)
+<b class="fc">&nbsp;public class CartController {</b>
+&nbsp;
+&nbsp;    @Autowired
+&nbsp;    private CartItemRepository cartItemRepository;
+&nbsp;
+&nbsp;    @Autowired
+&nbsp;    private UserRepository userRepository;
+&nbsp;
+&nbsp;    @Autowired
+&nbsp;    private PostingRepository postingRepository;
+&nbsp;
+&nbsp;    @GetMapping(&quot;/{userId}&quot;)
+&nbsp;    ResponseEntity&lt;?&gt; getCart(@PathVariable Integer userId){
+<b class="fc">&nbsp;        Optional&lt;User&gt; userWrapper = userRepository.findById(userId);</b>
+&nbsp;
+<b class="pc">&nbsp;        if(userWrapper.isEmpty()) return ResponseEntity.notFound().build();</b>
+<b class="nc">&nbsp;        User user = userWrapper.get();</b>
+<b class="nc">&nbsp;        if(!user.getUserStatus().equals(User.ACTIVE)) return ResponseEntity.status(403).build();</b>
+<b class="nc">&nbsp;        List&lt;CartItem&gt; cart = cartItemRepository.findByUser_Id(userId);</b>
+<b class="nc">&nbsp;        List&lt;PostingResponse&gt; cartPostingResponses = new ArrayList&lt;&gt;();</b>
+<b class="nc">&nbsp;        for(CartItem cartItem: cart){</b>
+<b class="nc">&nbsp;            Posting post = cartItem.getPosting();</b>
+<b class="nc">&nbsp;            PostingResponse postRes = new PostingResponse(post.getPostingId(),</b>
+<b class="nc">&nbsp;                    post.getSeller().getId(),</b>
+<b class="nc">&nbsp;                    post.getTitle(),</b>
+<b class="nc">&nbsp;                    post.getDescription(),</b>
+<b class="nc">&nbsp;                    post.getPrice(),</b>
+<b class="nc">&nbsp;                    post.getGenre(),</b>
+<b class="nc">&nbsp;                    post.getDatePosted(),</b>
+<b class="nc">&nbsp;                    post.getImageUrl());</b>
+<b class="nc">&nbsp;            cartPostingResponses.add(postRes);</b>
+&nbsp;        }
+<b class="nc">&nbsp;        return ResponseEntity.ok(cartPostingResponses);</b>
+&nbsp;    }
+&nbsp;
+&nbsp;    @PostMapping(&quot;/{userId}/{postingId}&quot;)
+&nbsp;    ResponseEntity&lt;?&gt; addToCart(@PathVariable Integer userId, @PathVariable Integer postingId){
+<b class="fc">&nbsp;        Optional&lt;User&gt; userWrapper = userRepository.findById(userId);</b>
+<b class="fc">&nbsp;        Optional&lt;Posting&gt; postingWrapper = postingRepository.findById(postingId);</b>
+<b class="pc">&nbsp;        if(userWrapper.isEmpty()||postingWrapper.isEmpty()) return ResponseEntity.notFound().build();</b>
+<b class="nc">&nbsp;        User user = userWrapper.get();</b>
+<b class="nc">&nbsp;        Posting post = postingWrapper.get();</b>
+<b class="nc">&nbsp;        if(!user.getUserStatus().equals(User.ACTIVE)) return ResponseEntity.status(403).build();</b>
+<b class="nc">&nbsp;        if(!post.getStatus().equals(Posting.ACTIVE)) return ResponseEntity.status(409).build();</b>
+<b class="nc">&nbsp;        if(cartItemRepository.existsByUser_IdAndPosting_PostingId(userId, postingId)) return ResponseEntity.status(409).build();</b>
+<b class="nc">&nbsp;        CartItem cartItem= new CartItem(user,post);</b>
+<b class="nc">&nbsp;        cartItemRepository.save(cartItem);</b>
+<b class="nc">&nbsp;        return ResponseEntity.ok().build();</b>
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    @DeleteMapping(&quot;/{userId}/{postingId}&quot;)
+&nbsp;    ResponseEntity&lt;?&gt; removeFromCart(@PathVariable Integer userId, @PathVariable Integer postingId){
+<b class="fc">&nbsp;        Optional&lt;User&gt; userWrapper = userRepository.findById(userId);</b>
+&nbsp;
+<b class="pc">&nbsp;        if(userWrapper.isEmpty()) return ResponseEntity.notFound().build();</b>
+<b class="nc">&nbsp;        User user = userWrapper.get();</b>
+<b class="nc">&nbsp;        if(!user.getUserStatus().equals(User.ACTIVE)) return ResponseEntity.status(403).build();</b>
+&nbsp;
+<b class="nc">&nbsp;        cartItemRepository.deleteByUser_IdAndPosting_PostingId(userId,postingId);</b>
+<b class="nc">&nbsp;        return ResponseEntity.ok().build();</b>
+&nbsp;
+&nbsp;    }
+&nbsp;
+&nbsp;    @DeleteMapping(&quot;/{userId}&quot;)
+&nbsp;    ResponseEntity&lt;?&gt; clearCart(@PathVariable Integer userId){
+<b class="fc">&nbsp;        Optional&lt;User&gt; userWrapper = userRepository.findById(userId);</b>
+&nbsp;
+<b class="pc">&nbsp;        if(userWrapper.isEmpty()) return ResponseEntity.notFound().build();</b>
+<b class="nc">&nbsp;        User user = userWrapper.get();</b>
+<b class="nc">&nbsp;        if(!user.getUserStatus().equals(User.ACTIVE)) return ResponseEntity.status(403).build();</b>
+<b class="nc">&nbsp;        cartItemRepository.deleteByUser_Id(userId);</b>
+<b class="nc">&nbsp;        return ResponseEntity.ok().build();</b>
+&nbsp;    }
+&nbsp;}
+</code>
+</pre>
+</div>
+
+<script type="text/javascript">
+(function() {
+    var msie = false, msie9 = false;
+    /*@cc_on
+      msie = true;
+      @if (@_jscript_version >= 9)
+        msie9 = true;
+      @end
+    @*/
+
+    if (!msie || msie && msie9) {
+      hljs.highlightAll()
+      hljs.initLineNumbersOnLoad();
+    }
+})();
+</script>
+
+<div class="footer">
+    
+    <div style="float:right;">generated on 2026-05-05 13:27</div>
+</div>
+</body>
+</html>

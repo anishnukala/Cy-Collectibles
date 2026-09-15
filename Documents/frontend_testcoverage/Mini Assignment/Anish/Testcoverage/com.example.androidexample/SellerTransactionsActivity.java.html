@@ -1,0 +1,304 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SellerTransactionsActivity.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=0;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">debug</a> &gt; <a href="index.source.html" class="el_package">com.example.androidexample</a> &gt; <span class="el_source">SellerTransactionsActivity.java</span></div><h1>SellerTransactionsActivity.java</h1><pre class="source lang-java linenums">package com.example.androidexample;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.Intent;
+import android.graphics.Typeface;
+import android.os.Bundle;
+import android.util.TypedValue;
+import android.widget.Button;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.Toast;
+
+import com.android.volley.Request;
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.Volley;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+
+<span class="nc" id="L29">public class SellerTransactionsActivity extends AppCompatActivity {</span>
+
+    private static final String BASE_URL = BuildConfig.BASE_URL;
+
+    private Button btnClose;
+    private LinearLayout transactionsContainer;
+    private BottomNavigationView bottomNav;
+
+<span class="nc" id="L37">    private long userId = -1;</span>
+<span class="nc" id="L38">    private String username = &quot;&quot;;</span>
+<span class="nc" id="L39">    private String userType = &quot;&quot;;</span>
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+<span class="nc" id="L43">        super.onCreate(savedInstanceState);</span>
+<span class="nc" id="L44">        setContentView(R.layout.activity_seller_transactions);</span>
+
+<span class="nc" id="L46">        userId = getIntent().getLongExtra(&quot;USER_ID&quot;, -1);</span>
+<span class="nc" id="L47">        username = getIntent().getStringExtra(&quot;USERNAME&quot;);</span>
+<span class="nc" id="L48">        userType = getIntent().getStringExtra(&quot;USERTYPE&quot;);</span>
+
+<span class="nc bnc" id="L50" title="All 2 branches missed.">        if (username == null) username = &quot;&quot;;</span>
+<span class="nc bnc" id="L51" title="All 2 branches missed.">        if (userType == null) userType = &quot;&quot;;</span>
+
+<span class="nc" id="L53">        btnClose = findViewById(R.id.btn_close);</span>
+<span class="nc" id="L54">        transactionsContainer = findViewById(R.id.transactions_container);</span>
+<span class="nc" id="L55">        bottomNav = findViewById(R.id.bottom_nav);</span>
+
+<span class="nc bnc" id="L57" title="All 6 branches missed.">        if (btnClose == null || transactionsContainer == null || bottomNav == null) {</span>
+<span class="nc" id="L58">            Toast.makeText(this, &quot;Layout error: missing view IDs&quot;, Toast.LENGTH_LONG).show();</span>
+<span class="nc" id="L59">            finish();</span>
+<span class="nc" id="L60">            return;</span>
+        }
+
+<span class="nc" id="L63">        btnClose.setOnClickListener(v -&gt; {</span>
+<span class="nc" id="L64">            Intent intent = new Intent(SellerTransactionsActivity.this, SellerHomeActivity.class);</span>
+<span class="nc" id="L65">            intent.putExtra(&quot;USER_ID&quot;, userId);</span>
+<span class="nc" id="L66">            intent.putExtra(&quot;USERNAME&quot;, username);</span>
+<span class="nc" id="L67">            intent.putExtra(&quot;USERTYPE&quot;, userType);</span>
+<span class="nc" id="L68">            startActivity(intent);</span>
+<span class="nc" id="L69">            overridePendingTransition(0, 0);</span>
+<span class="nc" id="L70">            finish();</span>
+<span class="nc" id="L71">        });</span>
+
+<span class="nc" id="L73">        setupBottomNav();</span>
+<span class="nc" id="L74">        loadTransactions();</span>
+<span class="nc" id="L75">    }</span>
+
+    @Override
+    protected void onResume() {
+<span class="nc" id="L79">        super.onResume();</span>
+<span class="nc bnc" id="L80" title="All 2 branches missed.">        if (transactionsContainer != null) {</span>
+<span class="nc" id="L81">            loadTransactions();</span>
+        }
+<span class="nc" id="L83">    }</span>
+
+    private void setupBottomNav() {
+<span class="nc" id="L86">        bottomNav.setSelectedItemId(R.id.nav_seller_transactions);</span>
+
+<span class="nc" id="L88">        bottomNav.setOnItemSelectedListener(item -&gt; {</span>
+<span class="nc" id="L89">            int id = item.getItemId();</span>
+
+<span class="nc bnc" id="L91" title="All 2 branches missed.">            if (id == R.id.nav_seller_dashboard) {</span>
+<span class="nc" id="L92">                Intent intent = new Intent(SellerTransactionsActivity.this, SellerHomeActivity.class);</span>
+<span class="nc" id="L93">                intent.putExtra(&quot;USER_ID&quot;, userId);</span>
+<span class="nc" id="L94">                intent.putExtra(&quot;USERNAME&quot;, username);</span>
+<span class="nc" id="L95">                intent.putExtra(&quot;USERTYPE&quot;, userType);</span>
+<span class="nc" id="L96">                startActivity(intent);</span>
+<span class="nc" id="L97">                overridePendingTransition(0, 0);</span>
+<span class="nc" id="L98">                finish();</span>
+<span class="nc" id="L99">                return true;</span>
+
+<span class="nc bnc" id="L101" title="All 2 branches missed.">            } else if (id == R.id.nav_seller_active_listings) {</span>
+<span class="nc" id="L102">                Intent intent = new Intent(SellerTransactionsActivity.this, SellerActiveListingsActivity.class);</span>
+<span class="nc" id="L103">                intent.putExtra(&quot;USER_ID&quot;, userId);</span>
+<span class="nc" id="L104">                intent.putExtra(&quot;USERNAME&quot;, username);</span>
+<span class="nc" id="L105">                intent.putExtra(&quot;USERTYPE&quot;, userType);</span>
+<span class="nc" id="L106">                startActivity(intent);</span>
+<span class="nc" id="L107">                overridePendingTransition(0, 0);</span>
+<span class="nc" id="L108">                finish();</span>
+<span class="nc" id="L109">                return true;</span>
+
+<span class="nc bnc" id="L111" title="All 2 branches missed.">            } else if (id == R.id.nav_seller_transactions) {</span>
+<span class="nc" id="L112">                return true;</span>
+
+<span class="nc bnc" id="L114" title="All 2 branches missed.">            } else if (id == R.id.nav_seller_chat) {</span>
+<span class="nc" id="L115">                Intent intent = new Intent(SellerTransactionsActivity.this, ChatHomeActivity.class);</span>
+<span class="nc" id="L116">                intent.putExtra(&quot;USER_ID&quot;, userId);</span>
+<span class="nc" id="L117">                intent.putExtra(&quot;USERNAME&quot;, username);</span>
+<span class="nc" id="L118">                intent.putExtra(&quot;USERTYPE&quot;, userType);</span>
+<span class="nc" id="L119">                startActivity(intent);</span>
+<span class="nc" id="L120">                overridePendingTransition(0, 0);</span>
+<span class="nc" id="L121">                finish();</span>
+<span class="nc" id="L122">                return true;</span>
+            }
+
+<span class="nc" id="L125">            return false;</span>
+        });
+<span class="nc" id="L127">    }</span>
+
+    private void loadTransactions() {
+<span class="nc" id="L130">        transactionsContainer.removeAllViews();</span>
+
+<span class="nc bnc" id="L132" title="All 2 branches missed.">        if (userId == -1) {</span>
+<span class="nc" id="L133">            addEmptyMessage(&quot;Invalid user ID&quot;);</span>
+<span class="nc" id="L134">            Toast.makeText(this, &quot;Invalid user ID&quot;, Toast.LENGTH_SHORT).show();</span>
+<span class="nc" id="L135">            return;</span>
+        }
+
+<span class="nc" id="L138">        String url = BASE_URL + &quot;/transactions/seller/&quot; + userId;</span>
+
+<span class="nc" id="L140">        JsonArrayRequest request = new JsonArrayRequest(</span>
+                Request.Method.GET,
+                url,
+                null,
+                this::bindTransactions,
+                error -&gt; {
+<span class="nc" id="L146">                    transactionsContainer.removeAllViews();</span>
+<span class="nc" id="L147">                    addEmptyMessage(&quot;Failed to load transactions&quot;);</span>
+<span class="nc" id="L148">                    Toast.makeText(this, &quot;Failed to load transactions&quot;, Toast.LENGTH_SHORT).show();</span>
+<span class="nc" id="L149">                }</span>
+        );
+
+<span class="nc" id="L152">        Volley.newRequestQueue(this).add(request);</span>
+<span class="nc" id="L153">    }</span>
+
+    private void bindTransactions(JSONArray transactions) {
+<span class="nc" id="L156">        transactionsContainer.removeAllViews();</span>
+
+<span class="nc bnc" id="L158" title="All 4 branches missed.">        if (transactions == null || transactions.length() == 0) {</span>
+<span class="nc" id="L159">            addEmptyMessage(&quot;No transactions found&quot;);</span>
+<span class="nc" id="L160">            return;</span>
+        }
+
+        try {
+<span class="nc" id="L164">            List&lt;JSONObject&gt; transactionList = new ArrayList&lt;&gt;();</span>
+
+<span class="nc bnc" id="L166" title="All 2 branches missed.">            for (int i = 0; i &lt; transactions.length(); i++) {</span>
+<span class="nc" id="L167">                transactionList.add(transactions.getJSONObject(i));</span>
+            }
+
+            // NEWEST → OLDEST
+<span class="nc" id="L171">            Collections.sort(transactionList, (a, b) -&gt; {</span>
+<span class="nc" id="L172">                long timeA = parseDate(a.optString(&quot;dateSold&quot;, &quot;&quot;));</span>
+<span class="nc" id="L173">                long timeB = parseDate(b.optString(&quot;dateSold&quot;, &quot;&quot;));</span>
+<span class="nc" id="L174">                return Long.compare(timeB, timeA);</span>
+            });
+
+<span class="nc bnc" id="L177" title="All 2 branches missed.">            for (JSONObject transaction : transactionList) {</span>
+
+<span class="nc" id="L179">                int transactionId = transaction.optInt(&quot;transactionId&quot;, -1);</span>
+<span class="nc" id="L180">                int buyerId = transaction.optInt(&quot;buyerId&quot;, -1);</span>
+
+<span class="nc" id="L182">                String rawDate = transaction.optString(&quot;dateSold&quot;, &quot;Unknown&quot;);</span>
+<span class="nc" id="L183">                String dateSold = formatDisplayDate(rawDate);</span>
+
+<span class="nc" id="L185">                JSONObject posting = transaction.optJSONObject(&quot;posting&quot;);</span>
+<span class="nc bnc" id="L186" title="All 2 branches missed.">                String title = posting != null ? posting.optString(&quot;title&quot;, &quot;Unknown&quot;) : &quot;Unknown&quot;;</span>
+<span class="nc bnc" id="L187" title="All 2 branches missed.">                int price = posting != null ? posting.optInt(&quot;price&quot;, 0) : 0;</span>
+<span class="nc bnc" id="L188" title="All 2 branches missed.">                String genre = posting != null ? posting.optString(&quot;genre&quot;, &quot;Unknown&quot;) : &quot;Unknown&quot;;</span>
+
+<span class="nc" id="L190">                addTransactionCard(transactionId, buyerId, dateSold, title, price, genre);</span>
+<span class="nc" id="L191">            }</span>
+
+<span class="nc" id="L193">        } catch (Exception e) {</span>
+<span class="nc" id="L194">            transactionsContainer.removeAllViews();</span>
+<span class="nc" id="L195">            addEmptyMessage(&quot;Failed to parse transactions&quot;);</span>
+<span class="nc" id="L196">            Toast.makeText(this, &quot;Failed to parse transactions&quot;, Toast.LENGTH_SHORT).show();</span>
+<span class="nc" id="L197">        }</span>
+<span class="nc" id="L198">    }</span>
+
+    // 🔥 FORMAT: Apr 02 2026
+    private String formatDisplayDate(String raw) {
+<span class="nc bnc" id="L202" title="All 6 branches missed.">        if (raw == null || raw.trim().isEmpty() || raw.equalsIgnoreCase(&quot;Unknown&quot;)) {</span>
+<span class="nc" id="L203">            return &quot;Unknown&quot;;</span>
+        }
+
+        try {
+<span class="nc" id="L207">            SimpleDateFormat input = new SimpleDateFormat(&quot;yyyy-MM-dd'T'HH:mm:ss.SSSX&quot;, Locale.getDefault());</span>
+<span class="nc" id="L208">            Date date = input.parse(raw);</span>
+<span class="nc bnc" id="L209" title="All 2 branches missed.">            if (date == null) return raw;</span>
+
+<span class="nc" id="L211">            SimpleDateFormat output = new SimpleDateFormat(&quot;MMM dd yyyy&quot;, Locale.getDefault());</span>
+<span class="nc" id="L212">            return output.format(date);</span>
+
+<span class="nc" id="L214">        } catch (Exception e1) {</span>
+            try {
+<span class="nc" id="L216">                SimpleDateFormat input2 = new SimpleDateFormat(&quot;yyyy-MM-dd'T'HH:mm:ssX&quot;, Locale.getDefault());</span>
+<span class="nc" id="L217">                Date date = input2.parse(raw);</span>
+<span class="nc bnc" id="L218" title="All 2 branches missed.">                if (date == null) return raw;</span>
+
+<span class="nc" id="L220">                SimpleDateFormat output = new SimpleDateFormat(&quot;MMM dd yyyy&quot;, Locale.getDefault());</span>
+<span class="nc" id="L221">                return output.format(date);</span>
+
+<span class="nc" id="L223">            } catch (Exception e2) {</span>
+<span class="nc" id="L224">                return raw;</span>
+            }
+        }
+    }
+
+    private long parseDate(String raw) {
+        try {
+<span class="nc" id="L231">            SimpleDateFormat input = new SimpleDateFormat(&quot;yyyy-MM-dd'T'HH:mm:ss.SSSX&quot;, Locale.getDefault());</span>
+<span class="nc" id="L232">            Date date = input.parse(raw);</span>
+<span class="nc bnc" id="L233" title="All 2 branches missed.">            return date != null ? date.getTime() : 0;</span>
+<span class="nc" id="L234">        } catch (Exception e1) {</span>
+            try {
+<span class="nc" id="L236">                SimpleDateFormat input2 = new SimpleDateFormat(&quot;yyyy-MM-dd'T'HH:mm:ssX&quot;, Locale.getDefault());</span>
+<span class="nc" id="L237">                Date date = input2.parse(raw);</span>
+<span class="nc bnc" id="L238" title="All 2 branches missed.">                return date != null ? date.getTime() : 0;</span>
+<span class="nc" id="L239">            } catch (Exception e2) {</span>
+<span class="nc" id="L240">                return 0;</span>
+            }
+        }
+    }
+
+    private void addEmptyMessage(String message) {
+<span class="nc" id="L246">        TextView emptyView = new TextView(this);</span>
+<span class="nc" id="L247">        emptyView.setText(message);</span>
+<span class="nc" id="L248">        emptyView.setTextSize(TypedValue.COMPLEX_UNIT_SP, 18);</span>
+<span class="nc" id="L249">        emptyView.setTextColor(0xFF666666);</span>
+
+<span class="nc" id="L251">        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(</span>
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+<span class="nc" id="L255">        params.topMargin = dp(10);</span>
+<span class="nc" id="L256">        emptyView.setLayoutParams(params);</span>
+
+<span class="nc" id="L258">        transactionsContainer.addView(emptyView);</span>
+<span class="nc" id="L259">    }</span>
+
+    private void addTransactionCard(int transactionId, int buyerId, String dateSold, String title, int price, String genre) {
+<span class="nc" id="L262">        LinearLayout card = new LinearLayout(this);</span>
+<span class="nc" id="L263">        card.setOrientation(LinearLayout.VERTICAL);</span>
+<span class="nc" id="L264">        card.setBackgroundResource(R.drawable.bg_input);</span>
+<span class="nc" id="L265">        card.setPadding(dp(14), dp(14), dp(14), dp(14));</span>
+
+<span class="nc" id="L267">        LinearLayout.LayoutParams cardParams = new LinearLayout.LayoutParams(</span>
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT
+        );
+<span class="nc" id="L271">        cardParams.topMargin = dp(12);</span>
+<span class="nc" id="L272">        card.setLayoutParams(cardParams);</span>
+
+<span class="nc" id="L274">        TextView tvName = new TextView(this);</span>
+<span class="nc" id="L275">        tvName.setText(title);</span>
+<span class="nc" id="L276">        tvName.setTextSize(TypedValue.COMPLEX_UNIT_SP, 20);</span>
+<span class="nc" id="L277">        tvName.setTextColor(0xFF444444);</span>
+<span class="nc" id="L278">        tvName.setTypeface(null, Typeface.BOLD);</span>
+
+<span class="nc" id="L280">        TextView tvDetails = new TextView(this);</span>
+<span class="nc" id="L281">        tvDetails.setText(</span>
+                &quot;Transaction ID: &quot; + transactionId +
+                        &quot;\nBuyer ID: &quot; + buyerId +
+                        &quot;\nPrice: $&quot; + price +
+                        &quot;\nGenre: &quot; + genre +
+                        &quot;\nDate Sold: &quot; + dateSold
+        );
+<span class="nc" id="L288">        tvDetails.setTextSize(TypedValue.COMPLEX_UNIT_SP, 16);</span>
+<span class="nc" id="L289">        tvDetails.setTextColor(0xFF666666);</span>
+
+<span class="nc" id="L291">        card.addView(tvName);</span>
+<span class="nc" id="L292">        card.addView(tvDetails);</span>
+<span class="nc" id="L293">        transactionsContainer.addView(card);</span>
+<span class="nc" id="L294">    }</span>
+
+    private int dp(int value) {
+<span class="nc" id="L297">        return (int) TypedValue.applyDimension(</span>
+                TypedValue.COMPLEX_UNIT_DIP,
+                value,
+<span class="nc" id="L300">                getResources().getDisplayMetrics()</span>
+        );
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.12.202403310830</span>Generated by the Android Gradle plugin 8.12.2</div></body></html>
