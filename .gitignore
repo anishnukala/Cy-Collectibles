@@ -43,6 +43,9 @@ gen-external-apklibs
 # Compiled class file
 *.class
 
+# Maven build output
+target/
+
 # Log file
 
 # BlueJ files
@@ -200,3 +203,9 @@ fabric.properties
 
 !Frontend/tutorials-android_unit1_3_login_signup/AndroidExample/gradle/wrapper/gradle-wrapper.jar
 .DS_Store
+
+# Generated reports and runtime uploads
+Backend/springboot_example/htmlReport/
+Backend/springboot_example/uploads/
+**/Test Results*.html
+Documents/frontend_testcoverage/**/*.mov

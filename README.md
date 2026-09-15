@@ -36,6 +36,10 @@ Cy Collectibles is an Android marketplace where collectors can discover, buy, an
 
 ![Create listing form and profile settings](4.jpg)
 
+## Architecture
+
+![Cy Collectibles software architecture](software%20architecture%20diagram.jpeg)
+
 ## Technology
 
 | Component | Technologies |
