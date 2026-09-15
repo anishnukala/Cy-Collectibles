@@ -1,95 +1,128 @@
-# 1_sb_8
+# Cy Collectibles
 
+Cy Collectibles is an Android marketplace where collectors can discover, buy, and sell collectibles. The application supports buyer, seller, and administrator accounts, with real-time messaging and AI-assisted listing tools.
 
+## Features
+
+- Browse, search, filter, and sort collectible listings
+- Create listings with photos, prices, categories, and descriptions
+- Manage a shopping cart and complete purchases
+- View buyer and seller transaction histories
+- Send direct and group messages through WebSockets
+- Ask CyBot for personalized recommendations and account information
+- Generate AI summaries for listings
+- Follow favorite collectible categories
+- Report listings and moderate users through an administrator dashboard
+
+## Screenshots
+
+### Application overview
+
+![Cy Collectibles application overview](5.jpg)
+
+### Marketplace and dashboards
+
+![Marketplace, seller dashboard, and administrator dashboard](1.jpg)
+
+### Listings, transactions, and AI assistance
+
+![Listing details, transaction history, and active listings](2.jpg)
+
+### Messaging and CyBot
+
+![Direct messaging, group messaging, and CyBot](3.jpg)
+
+### Listing creation and profile settings
+
+![Create listing form and profile settings](4.jpg)
+
+## Technology
+
+| Component | Technologies |
+| --- | --- |
+| Android client | Java, Android SDK 33, Material Components, Volley, OkHttp, Glide |
+| Backend API | Java, Spring Boot 3.4, Spring Data JPA, REST, WebSockets |
+| Database | MariaDB |
+| AI | Google Gemini API |
+| Testing | JUnit, Espresso, REST Assured, MockWebServer |
+
+## Project structure
+
+```text
+.
+├── Backend/springboot_example/          # Spring Boot API and backend tests
+├── Frontend/tutorials-android_unit1_3_login_signup/
+│   └── AndroidExample/                  # Main Android application
+├── Documents/                           # Diagrams, documentation, and coverage reports
+└── Experiments/                         # Team development experiments
+```
 
 ## Getting started
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+### Requirements
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+- Java 17 or newer
+- Maven 3.9 or newer
+- MariaDB
+- Android Studio with Android SDK 33
+- A Gemini API key for AI features
 
-## Add your files
+### Run the backend
 
-* [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-* [Add files using the command line](https://docs.gitlab.com/topics/git/add_files/#add-files-to-a-git-repository) or push an existing Git repository with the following command:
+Configure the database and Gemini credentials as environment variables:
 
+```bash
+export SPRING_DATASOURCE_URL="jdbc:mariadb://localhost:3306/cycollectibles_db"
+export DB_USERNAME="your_database_username"
+export DB_PASSWORD="your_database_password"
+export GEMINI_API_KEY="your_gemini_api_key"
 ```
-cd existing_repo
-git remote add origin https://git.las.iastate.edu/cs309/2026spring/1_sb_8.git
-git branch -M main
-git push -uf origin main
+
+Start the API:
+
+```bash
+cd Backend/springboot_example
+mvn spring-boot:run
 ```
 
-## Integrate with your tools
+The backend runs on `http://localhost:8080`. Swagger UI is available at `http://localhost:8080/swagger-ui-custom.html`.
 
-* [Set up project integrations](https://git.las.iastate.edu/cs309/2026spring/1_sb_8/-/settings/integrations)
+### Run the Android application
 
-## Collaborate with your team
+1. Open `Frontend/tutorials-android_unit1_3_login_signup/AndroidExample` in Android Studio.
+2. Update `BASE_URL` in `app/build.gradle` so it points to the backend. Use `http://10.0.2.2:8080` when the backend runs on the same computer as the Android emulator.
+3. Sync the Gradle project.
+4. Run the `app` configuration on an emulator or Android device running API 24 or newer.
 
-* [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-* [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-* [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-* [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-* [Set auto-merge](https://docs.gitlab.com/user/project/merge_requests/auto_merge/)
+To build from the command line:
 
-## Test and Deploy
+```bash
+cd Frontend/tutorials-android_unit1_3_login_signup/AndroidExample
+./gradlew assembleDebug
+```
 
-Use the built-in continuous integration in GitLab.
+## Testing
 
-* [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/)
-* [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-* [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-* [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-* [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+Run the backend test suite:
 
-***
+```bash
+cd Backend/springboot_example
+mvn test
+```
 
-# Editing this README
+Run the Android unit tests:
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
+```bash
+cd Frontend/tutorials-android_unit1_3_login_signup/AndroidExample
+./gradlew test
+```
 
-## Suggestions for a good README
+Run the Android instrumented tests with an emulator or device connected:
 
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+```bash
+./gradlew connectedAndroidTest
+```
 
-## Name
-Choose a self-explaining name for your project.
+## Security
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
-
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
-
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
-
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
-
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
-
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
-
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
-
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
-
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
-
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
-
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
-
-## License
-For open source projects, say how it is licensed.
-
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
-
-![alt text](5.jpg) ![alt text](1.jpg) ![alt text](2.jpg) ![alt text](3.jpg) ![alt text](4.jpg)
+Database credentials and API keys are loaded from environment variables. Do not commit credentials or local configuration containing secrets.
